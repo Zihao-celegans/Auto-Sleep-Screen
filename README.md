@@ -26,7 +26,7 @@ Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
 Each `figureN/` folder is self-contained: open MATLAB, `cd` into the folder,
 and run `Main_figureN.m`. The script will generate the figures shown in the paper.
 
-The SKAT association analysis pipeline lives in
+The SKAT analysis pipeline lives in
 [SKAT/](SKAT/); see [SKAT/README.md](SKAT/README.md) for how to run it.
 
 Shared MATLAB helper functions live in [helpers/](helpers/); see
