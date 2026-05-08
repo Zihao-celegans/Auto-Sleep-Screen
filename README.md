@@ -36,8 +36,7 @@ and run `plot_figureN.m`. The script will generate the figures shown in the pape
 
 **R** (for the SKAT pipeline only; tested on R 4.3+)
 - `SKAT`
-- See [SKAT/scripts/run_pipeline.R](SKAT/scripts/run_pipeline.R) for the full
-  list and usage.
+- See [SKAT/README.md](SKAT/README.md) for the full list and usage.
 
 ## Reproducing the figures
 
