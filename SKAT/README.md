@@ -1,6 +1,6 @@
-# MMP SKAT Analysis Pipeline
+# Sequence Kernel Association Test (SKAT)
 
-Sequence Kernel Association Test (SKAT) pipeline associating gene-level variant sets in MMP (Mutagenesis Mapping Panel) *C. elegans* strains with a continuous phenotype. 
+Sequence Kernel Association Test (SKAT) pipeline for gene-level association analysis of stress-induced sleep (SIS) phenotype in the Million Mutation Project (MMP) *C. elegans* strains.
 
 ---
 
