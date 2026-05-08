@@ -18,7 +18,6 @@ Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
 ├── figure2/         Figure 2 plotting script + processed data
 ├── figure3/         Figure 3 plotting script, processed data
 ├── helpers/         Shared MATLAB helper functions used by the figure scripts
-├── supplemental/    Script that regenerates Supplementary Table S1
 ├── SKAT/            R/SKAT pipeline used for the variant-level association
 │                    analysis (inputs, scripts, and result tables)
 ├── LICENSE          Apache License 2.0
@@ -44,9 +43,6 @@ and run `plot_figureN.m`. The script will generate the figures shown in the pape
 2. Open MATLAB and set the working directory to one of the `figureN/` folders.
 3. Run `plot_figureN.m`. Figures display on screen and are saved as SVG
    files into the same folder. SVG/PDF/PNG outputs are git-ignored.
-
-For Supplementary Table S1, run [supplemental/make_table_S1_mmp_strains.m](supplemental/make_table_S1_mmp_strains.m)
-from MATLAB; it writes `Table_S1.xlsx` into the same folder.
 
 ## License
 
