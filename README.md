@@ -3,7 +3,7 @@
 Code and data accompanying the manuscript:
 
 **An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans***
-Zihao (John) Li *et al.*, Fang-Yen Laboratory, Department of Biomedical Engineering, The Ohio State University.
+authored by Zihao (John) Li *et al.*, Fang-Yen Laboratory, Department of Biomedical Engineering, The Ohio State University.
 
 The manuscript will be deposited on bioRxiv.
 Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
@@ -63,5 +63,4 @@ added once the bioRxiv preprint is live).
 - Zihao (John) Li — <lizihaojohn@outlook.com>
 - Christopher Fang-Yen (PI) — <fang-yen.1@osu.edu>
 
-For questions or issues, please open a GitHub issue or contact the
-Fang-Yen Lab at The Ohio State University.
+For questions or issues, please contact the Fang-Yen Lab at The Ohio State University.
