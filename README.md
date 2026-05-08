@@ -1,10 +1,93 @@
 # Auto-Sleep-Screen
 
-Auto-Sleep-Screen is a repository hosting supplementary material for the manuscript entitled **"An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans*"** authored by **Zihao (John) Li *et al.*** from the **Fang-Yen Laboratory** at the Department of Biomedical Engineering, The Ohio State University.
-    
-The paper will be submitted to bioRxiv.
+Code and processed data accompanying the manuscript:
 
-Auto-Sleep-Screen is hosted on GitHub, the repository can be viewed and cloned at:
-[https://github.com/Zihao-celegans/Auto-Sleep-Screen](https://github.com/Zihao-celegans/Auto-Sleep-Screen)
+> **An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans***
+> Zihao (John) Li *et al.*, Fang-Yen Laboratory, Department of Biomedical Engineering, The Ohio State University.
 
-The raw data and the code to reproduce the figures shown in the paper can be found in the folder with the corresponding name.
+The manuscript will be deposited on bioRxiv.
+Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
+
+---
+
+## Repository layout
+
+```
+.
+├── figure1/         Figure 1 plotting script + processed data
+├── figure2/         Figure 2 plotting script + processed data
+├── figure3/         Figure 3 plotting script, processed data, and a
+│                    one-time preprocessor for the per-gene panels
+├── helpers/         Shared MATLAB helper functions used by the figure scripts
+├── supplemental/    Script that regenerates Supplementary Table S1
+├── SKAT/            R/SKAT pipeline used for the variant-level association
+│                    analysis (inputs, scripts, and result tables)
+├── LICENSE          Apache License 2.0
+└── README.md
+```
+
+Each `figureN/` folder is self-contained: open MATLAB, `cd` into the folder,
+and run `plot_figureN.m`. The script will pull helpers from `../helpers/`
+automatically via `addpath`.
+
+## Figures and where they come from
+
+| Panel(s)                                                  | Script                                                                               | Data file(s) loaded                                                                                                              |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| Fig 1B / 1C / 1D                                          | [figure1/plot_figure1.m](figure1/plot_figure1.m)                                     | [figure1/data.mat](figure1/data.mat)                                                                                             |
+| Fig 2A                                                    | [figure2/plot_figure2.m](figure2/plot_figure2.m)                                     | [figure2/robot_MMP_Qf.mat](figure2/robot_MMP_Qf.mat), [figure2/sleep_data_cleaned.mat](figure2/sleep_data_cleaned.mat)            |
+| Fig 2B                                                    | [figure2/plot_figure2.m](figure2/plot_figure2.m)                                     | [figure2/sleep_data_N2_Kerry.mat](figure2/sleep_data_N2_Kerry.mat), [figure2/robot_N2_Qf_byWM.mat](figure2/robot_N2_Qf_byWM.mat) |
+| Fig 3A                                                    | [figure3/plot_figure3.m](figure3/plot_figure3.m)                                     | [figure3/data_strain_summary.mat](figure3/data_strain_summary.mat)                                                               |
+| Fig 3B                                                    | [figure3/plot_figure3.m](figure3/plot_figure3.m)                                     | [figure3/data_per_worm.mat](figure3/data_per_worm.mat)                                                                           |
+| Per-gene heatmaps + scatters (*strd-1*, *cla-1*, *egl-8*) | [figure3/plot_figure3.m](figure3/plot_figure3.m)                                     | [figure3/data_per_gene.mat](figure3/data_per_gene.mat)                                                                           |
+| Table S1                                                  | [supplemental/make_table_S1_mmp_strains.m](supplemental/make_table_S1_mmp_strains.m) | (writes `Table_S1.xlsx`)                                                                                                         |
+| Variant-level association (SKAT)                          | [SKAT/scripts/run_pipeline.R](SKAT/scripts/run_pipeline.R)                            | See [SKAT/README.md](SKAT/README.md)                                                                                             |
+
+`plot_figure3.m` is organized in cells (`%% ===`); you can run it end-to-end
+or evaluate panel cells individually.
+
+## Software requirements
+
+**MATLAB** (tested on R2023b or later)
+- Statistics and Machine Learning Toolbox (`ranksum`, `vartestn`, `ttest2`)
+- Bioinformatics Toolbox (`mafdr`, used for FDR control)
+
+**R** (for the SKAT pipeline only; tested on R 4.3+)
+- `SKAT`
+- See [SKAT/scripts/run_pipeline.R](SKAT/scripts/run_pipeline.R) for the full
+  list and usage.
+
+## Reproducing the figures
+
+1. Clone the repository.
+2. Open MATLAB and set the working directory to one of the `figureN/` folders.
+3. Run `plot_figureN.m`. Figures display on screen; SVG/PDF/PNG outputs are
+   git-ignored and can be regenerated by uncommenting the relevant
+   `print` / `exportgraphics` lines.
+
+For the per-gene panels in Figure 3, [figure3/data_per_gene.mat](figure3/data_per_gene.mat)
+is committed and is all that `plot_figure3.m` needs. The companion script
+[figure3/preprocess_per_gene_data.m](figure3/preprocess_per_gene_data.m)
+is provided for transparency: it scans the raw recording folders, builds the
+per-worm/per-trace tables, filters them down to the strains of interest, and
+writes `data_per_gene.mat`. You only need to run it if you have access to the
+raw recordings and want to regenerate the processed data from scratch — the
+`baseDirs` paths inside that script must be edited to point at your local
+copy of the data.
+
+For Supplementary Table S1, run [supplemental/make_table_S1_mmp_strains.m](supplemental/make_table_S1_mmp_strains.m)
+from MATLAB; it writes `Table_S1.xlsx` into the same folder.
+
+## License
+
+Apache License 2.0 — see [LICENSE](LICENSE).
+
+## Citation
+
+If you use this code or data, please cite the manuscript (citation will be
+added once the bioRxiv preprint is live).
+
+## Contact
+
+Questions or issues: open a GitHub issue, or contact the Fang-Yen Lab at
+The Ohio State University.
