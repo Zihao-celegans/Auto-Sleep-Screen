@@ -417,6 +417,7 @@ strainToGene = containers.Map( ...
      );
 
 geneList = {'strd-1', 'cla-1', 'egl-8'};
+genePanel = {'Fig3C',  'Fig3D', 'Fig3E'};   % panel letter for each gene
 
 alpha_pre  = 0.05; %#ok<NASGU>
 alpha_post = 0.05; %#ok<NASGU>
@@ -626,7 +627,7 @@ for g = 1:numel(geneList)
     ax.FontSize = 29;
     pbaspect([1 ratio 1]);
 
-    exportgraphics(gca, [gene,'heat.svg']);
+    exportgraphics(gca, [genePanel{g}, '_heatmap.svg']);
 
     %% =========================================================
     %   Per-strain stats for scatter plot
@@ -849,6 +850,6 @@ for g = 1:numel(geneList)
     ax.LineWidth = 2;
     pbaspect([1 ratio 1]);
 
-    exportgraphics(gca, [gene,'_scatter.svg']);
+    exportgraphics(gca, [genePanel{g}, '_scatterplot.svg']);
 
 end
