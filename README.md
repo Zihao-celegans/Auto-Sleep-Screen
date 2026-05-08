@@ -2,7 +2,7 @@
 
 Code and data accompanying the manuscript:
 
-**An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans***
+"**An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans***"
 authored by Zihao (John) Li *et al.*, Fang-Yen Laboratory, Department of Biomedical Engineering, The Ohio State University.
 
 The manuscript will be deposited on bioRxiv.
