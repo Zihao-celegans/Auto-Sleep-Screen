@@ -18,8 +18,7 @@ Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
 ├── figure2/         Figure 2 plotting script + data
 ├── figure3/         Figure 3 plotting script + data
 ├── helpers/         Shared MATLAB helper functions used by the figure scripts
-├── SKAT/            R/SKAT pipeline used for the association
-│                    analysis
+├── SKAT/            R/SKAT pipeline used for the association analysis
 ├── LICENSE          Apache License 2.0
 └── README.md
 ```
