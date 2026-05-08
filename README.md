@@ -1,6 +1,6 @@
 # Auto-Sleep-Screen
 
-Code and processed data accompanying the manuscript:
+Code and data accompanying the manuscript:
 
 **An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans***
 Zihao (John) Li *et al.*, Fang-Yen Laboratory, Department of Biomedical Engineering, The Ohio State University.
@@ -14,11 +14,11 @@ Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
 
 ```
 .
-├── figure1/         Figure 1 plotting script + processed data
-├── figure2/         Figure 2 plotting script + processed data
-├── figure3/         Figure 3 plotting script, processed data
+├── figure1/         Figure 1 plotting script + data
+├── figure2/         Figure 2 plotting script + data
+├── figure3/         Figure 3 plotting script + data
 ├── helpers/         Shared MATLAB helper functions used by the figure scripts
-├── SKAT/            R/SKAT pipeline used for the variant-level association
+├── SKAT/            R/SKAT pipeline used for the association
 │                    analysis (inputs, scripts, and result tables)
 ├── LICENSE          Apache License 2.0
 └── README.md
