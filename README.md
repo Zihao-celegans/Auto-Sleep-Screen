@@ -1,6 +1,6 @@
 # Auto-Sleep-Screen
 
-Auto-Sleep-Screen is a repository hosting supplementary material for the manuscript entitled **"An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans*"** authored by **Zihao (John) Li et al.** from the **Fang-Yen Laboratory** at the Department of Biomedical Engineering, The Ohio State University.
+Auto-Sleep-Screen is a repository hosting supplementary material for the manuscript entitled **"An automated genetic screen identifies modulators of stress-induced sleep in *Caenorhabditis elegans*"** authored by **Zihao (John) Li *et al.*** from the **Fang-Yen Laboratory** at the Department of Biomedical Engineering, The Ohio State University.
     
 The paper will be submitted to bioRxiv.
 
