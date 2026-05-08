@@ -1,0 +1,23 @@
+# MATLAB
+*.asv
+*.m~
+*.mex*
+slprj/
+
+# Generated figure outputs (regenerate from scripts)
+*.svg
+*.eps
+*.pdf
+*.png
+
+# Generated tables / intermediate data
+MMP_strain_info.xlsx
+Figure_2A/Quiescence_Summary.mat
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
