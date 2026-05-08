@@ -25,7 +25,7 @@ Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
 ```
 
 Each `figureN/` folder is self-contained: open MATLAB, `cd` into the folder,
-and run `plot_figureN.m`. The script will generate the figures shown in the papers.
+and run `Main_figureN.m`. The script will generate the figures shown in the paper.
 
 ## Software requirements
 
@@ -41,7 +41,7 @@ and run `plot_figureN.m`. The script will generate the figures shown in the pape
 
 1. Clone the repository.
 2. Open MATLAB and set the working directory to one of the `figureN/` folders.
-3. Run `plot_figureN.m`. Figures display on screen and are saved as SVG
+3. Run `Main_figureN.m`. Figures display on screen and are saved as SVG
    files into the same folder. SVG/PDF/PNG outputs are git-ignored.
 
 ## License

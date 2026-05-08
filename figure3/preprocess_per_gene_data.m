@@ -1,12 +1,12 @@
 %% One-time preprocessing for Figure 3 per-gene panels.
 % Scans the raw recording folders on disk, builds the per-worm tables used
-% by the heatmap + scatter panels in plot_figure3.m, filters them down to
+% by the heatmap + scatter panels in Main_figure3.m, filters them down to
 % the strains of interest (strd-1, cla-1, egl-8 alleles + same-date N2),
 % and saves a lightweight data_per_gene.mat next to this script.
 %
 % You only need to run this once, on a machine that has the raw recordings.
 % The resulting data_per_gene.mat is what gets committed to the repo and
-% loaded by plot_figure3.m at publication time.
+% loaded by Main_figure3.m at publication time.
 
 clear; clc;
 
