@@ -2,7 +2,7 @@
 % Panels:
 %   Fig3A : MMP-vs-N2 histogram (per-wormotel N2 reconstruction).
 %   Fig3B : Pre-UV vs post-UV mean ± SEM dot plot for follow-up alleles.
-%   Fig3 (per-gene) : trace heatmap + beeswarm scatter for strd-1, cla-1, egl-8.
+%   Fig3C-E (per-gene) : trace heatmap + beeswarm scatter for strd-1, cla-1, egl-8.
 %
 % Helper functions (fracQ, beeswarm) live in ../helpers/.
 %
