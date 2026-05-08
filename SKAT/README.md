@@ -7,7 +7,7 @@ Sequence Kernel Association Test (SKAT) pipeline for gene-level association anal
 ## Folder Structure
 
 ```
-SKAT_MMP/
+SKAT/
 ├── README.md
 ├── inputs/
 │   ├── inputs.zip               # MMP.bed, MMP.bim, MMP.fam, gene_variants.txt
