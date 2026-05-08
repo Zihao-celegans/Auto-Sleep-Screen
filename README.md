@@ -19,13 +19,19 @@ Repository: <https://github.com/Zihao-celegans/Auto-Sleep-Screen>
 ├── figure3/         Figure 3 plotting script + data
 ├── helpers/         Shared MATLAB helper functions used by the figure scripts
 ├── SKAT/            R/SKAT pipeline used for the association
-│                    analysis (inputs, scripts, and result tables)
+│                    analysis
 ├── LICENSE          Apache License 2.0
 └── README.md
 ```
 
 Each `figureN/` folder is self-contained: open MATLAB, `cd` into the folder,
 and run `Main_figureN.m`. The script will generate the figures shown in the paper.
+
+The SKAT association analysis pipeline lives in
+[SKAT/](SKAT/); see [SKAT/README.md](SKAT/README.md) for how to run it.
+
+Shared MATLAB helper functions live in [helpers/](helpers/); see
+[helpers/README.md](helpers/README.md) for a description of each one.
 
 ## Software requirements
 
@@ -55,5 +61,8 @@ added once the bioRxiv preprint is live).
 
 ## Contact
 
-Questions or issues: open a GitHub issue, or contact the Fang-Yen Lab at
-The Ohio State University.
+- Zihao (John) Li — <lizihaojohn@outlook.com>
+- Christopher Fang-Yen (PI) — <fang-yen.1@osu.edu>
+
+For questions or issues, please open a GitHub issue or contact the
+Fang-Yen Lab at The Ohio State University.
