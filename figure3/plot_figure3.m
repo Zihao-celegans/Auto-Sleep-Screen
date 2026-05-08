@@ -1,127 +1,404 @@
+%% Script for plotting Figure 3 of the Sleep Screen paper.
+% Panels:
+%   Fig3A : MMP-vs-N2 histogram (per-wormotel N2 reconstruction).
+%   Fig3B : Pre-UV vs post-UV mean ± SEM dot plot for follow-up alleles.
+%   Fig3 (per-gene) : trace heatmap + beeswarm scatter for strd-1, cla-1, egl-8.
+%
+% Helper functions (fracQ, beeswarm) live in ../helpers/.
+%
+% NOTE: the per-gene block below loads raw recordings from external Dropbox
+% folders (see baseDirs). Update those paths before running on a different
+% machine.
+
+clear all;
+close all;
+clc;
+
+addpath(fullfile('..', 'helpers'));
+
+%% === Fig3A : MMP-vs-N2 histogram ===
 clear; clc; close all;
 
-load('data.mat');
+load('data_strain_summary.mat');
 
-%% === Fig2A ===
+%% Filtered table only for strain-level histogram
+% Convert to string first (safe for manipulation)
+strainInfo.StrainName = string(strainInfo.StrainName);
 
-% === FILTER strains: keep only those in strainInfo ===
-resultsTable2 = resultsTable2(ismember(resultsTable2.Strain, strainInfo.Strain_Name), :);
+% Add " UV" to each strain
+strainInfo.StrainName = strainInfo.StrainName + " UV";
 
-% Summaries by strain
+% Remove any accidental spaces
+strainInfo.StrainName = strtrim(strainInfo.StrainName);
+
+% Convert to categorical
+strainInfo.StrainName = categorical(strainInfo.StrainName);
+
+
+strainInfo.Genotype = categorical(cellstr(strainInfo.Genotype));
+resultsTable2 = resultsTable(ismember(resultsTable.Strain, strainInfo.StrainName), :);
+
+%% Mean per strain (for histogram)
 [G, groupNames] = findgroups(resultsTable2.Strain);
-strain_means  = splitapply(@mean, resultsTable2.Qf_4hr_postUV, G);
-strain_sems   = splitapply(@(x) std(x)/sqrt(numel(x)), resultsTable2.Qf_4hr_postUV, G);
-strain_counts = splitapply(@numel, resultsTable2.Qf_4hr_postUV, G);
+mean_pre  = splitapply(@mean, resultsTable2.Qf_pre, G);
+mean_post = splitapply(@mean, resultsTable2.Qf_post, G);
 
-% Identify N2 (wild type)
-wt_idx = find(groupNames == 'N2 UV');
-wt_data = resultsTable2.Qf_4hr_postUV(resultsTable2.Strain == groupNames(wt_idx));
+%% Reconstruct N2 UV wormotels from ORIGINAL unfiltered table
+dates = unique(resultsTable.Date);
 
-% Compute p-values vs WT
-pvals = nan(size(groupNames));
-for i = 1:numel(groupNames)
-    if i == wt_idx, continue; end
-    strain_data = resultsTable2.Qf_4hr_postUV(resultsTable2.Strain == groupNames(i));
-    [~, p] = ttest2(wt_data, strain_data);
-    pvals(i) = p;
-end
+n2_mean_pre_by_wormotel  = [];
+n2_mean_post_by_wormotel = [];
+n2_block_sizes           = [];
+n2_block_date            = strings(0,1);
 
-% === FDR correction ===
-p_fdr = mafdr(pvals, 'BHFDR', true);
+for d = 1:numel(dates)
 
-% Sort all strains by descending mean (including N2)
-[~, sortOrder] = sort(strain_means, 'descend');
-groupNames    = groupNames(sortOrder);
-strain_means  = strain_means(sortOrder);
-strain_sems   = strain_sems(sortOrder);
-strain_counts = strain_counts(sortOrder);
-pvals         = pvals(sortOrder);
-p_fdr         = p_fdr(sortOrder);
+    thisDate = dates(d);
+    Tdate = resultsTable(resultsTable.Date == thisDate, :);
 
-% Plot bar + SEM
-fig = figure('Color','w'); hold on;
-set(fig, 'WindowState', 'maximized');
+    % Find N2 UV rows within this date in the ORIGINAL table
+    n2_rows = find(Tdate.Strain == "N2 UV");
 
-b = bar(strain_means, 'FaceColor','flat','EdgeColor','none');
+    if isempty(n2_rows)
+        continue;
+    end
 
-% Colors: N2 = green, significant = red, others = blue
-b.CData = repmat([0 0 1], numel(groupNames), 1);
-b.CData(groupNames == 'N2 UV', :) = [0 0.7 0];
-sig_idx = find(p_fdr < 0.05 & ~isnan(p_fdr));
-b.CData(sig_idx,:) = repmat([1 0 0], numel(sig_idx), 1);
+    % Split into contiguous blocks
+    breaks = [1; find(diff(n2_rows) > 1) + 1];
+    numBlocks = numel(breaks);
 
-% Error bars
-errorbar(1:numel(groupNames), strain_means, strain_sems, ...
-    'k', 'LineStyle','none', 'LineWidth',1.5);
+    for b = 1:numBlocks
 
-% ===== Build one-line x tick labels: Strain ; Genotype =====
-strainNames = cellstr(groupNames);
+        startIdx = breaks(b);
 
-infoNames = cellstr(strainInfo.Strain_Name);
-infoGenos = cellstr(strainInfo.Genotype);
+        if b < numBlocks
+            endIdx = breaks(b+1) - 1;
+        else
+            endIdx = numel(n2_rows);
+        end
 
-genotypes = strings(numel(strainNames),1);
-for ii = 1:numel(strainNames)
-    idx = strcmp(infoNames, strainNames{ii});
-    if any(idx)
-        g = infoGenos(idx);
-        genotypes(ii) = string(g{1});
-    else
-        genotypes(ii) = "";
+        blockRows = n2_rows(startIdx:endIdx);
+        blockSize = numel(blockRows);
+
+        n2_block_sizes(end+1,1) = blockSize;
+        n2_block_date(end+1,1)  = string(thisDate);
+
+        n2_mean_pre_by_wormotel(end+1,1) = ...
+            mean(Tdate.Qf_pre(blockRows), 'omitnan');
+
+        n2_mean_post_by_wormotel(end+1,1) = ...
+            mean(Tdate.Qf_post(blockRows), 'omitnan');
     end
 end
 
-combinedLabels = strcat(strainNames, {') '}, genotypes);
-combinedLabels = strcat(string(1:numel(combinedLabels))', {'- '}, combinedLabels);
+%% Plot
+cOrder = colororder;
+Color_postUV = cOrder(4,:);
 
-set(gca, 'XTick', 1:numel(groupNames), ...
-         'XTickLabel', combinedLabels, ...
-         'TickLabelInterpreter','none', ...
-         'FontSize', 7, 'LineWidth', 1.2);
-xtickangle(-45);
+figure;
+hold on;
+edges= [0:0.03:1];
 
-ylabel('Quiescence fraction (4h post UV)', 'FontSize', 12);
-title('UV-induced sleep: N2 vs other SKAT strains', 'FontSize', 13);
+% Histogram of N2 wormotel means (foreground)
 
-% Annotate only significant p-values
-ylims = ylim;
-for ii = sig_idx'
-    yPos = strain_means(ii) + strain_sems(ii) + 0.1*range(ylims);
-    text(ii, yPos, sprintf('q = %.2g', p_fdr(ii)), ...
-        'HorizontalAlignment','center','VerticalAlignment','middle', ...
-        'Rotation', -90, ...
-        'FontSize', 9,'FontWeight','bold');
+histogram(n2_mean_pre_by_wormotel,...
+    edges, 'Normalization', 'probability', ...
+    'FaceColor', [0.8 0.2 0], 'FaceAlpha', 0.4, 'EdgeColor', [0.8 0.2 0], 'EdgeAlpha', 1, ...
+    'LineStyle','none')
+
+histogram(n2_mean_post_by_wormotel, ...
+    edges, 'Normalization', 'probability', ...
+    'FaceColor', 'g', 'FaceAlpha', 0.4, 'EdgeColor', 'g', 'EdgeAlpha', 1, ...
+    'LineStyle','none')
+
+
+% Histogram across strains (background)
+histogram(mean_pre, edges, 'Normalization', 'probability', ...
+    'FaceColor', 'k', 'FaceAlpha', 0, 'EdgeColor', 'k', 'EdgeAlpha', 1,  ...
+    'LineStyle','--', 'LineWidth', 3);
+
+histogram(mean_post, edges, 'Normalization', 'probability',...
+    'FaceColor', Color_postUV, 'FaceAlpha', 0, 'EdgeColor', Color_postUV, 'EdgeAlpha', 1, ...
+    'LineStyle','-', 'LineWidth', 3)
+
+hold off;
+
+xlabel('Mean quiescence fraction');
+ylabel('Relative frequency');
+
+ax = gca;
+ax.FontSize = 25;
+ax.LineWidth = 2;
+pbaspect([1 1 1]);
+
+xticks(0:0.2:1);
+xlim([0 1]);
+
+f = gcf;
+f.Units = 'pixels';
+f.Position = [100 100 800 800];
+
+box off;
+
+exportgraphics(gca, "Fig3A.svg");
+
+%% Test of variance and mean
+
+% test of variance
+disp('test of variance for N2 and MMP')
+var_test_data_postUV = [mean_post; n2_mean_post_by_wormotel];
+groups_data_postUV = [ones(size(mean_post)); 2 * ones(size(n2_mean_post_by_wormotel))];
+vartestn(var_test_data_postUV, groups_data_postUV, 'TestType', 'BrownForsythe');
+
+var_test_data_preUV = [mean_pre; n2_mean_pre_by_wormotel];
+groups_data_preUV = [ones(size(mean_pre)); 2 * ones(size(n2_mean_pre_by_wormotel))];
+vartestn(var_test_data_preUV, groups_data_preUV, 'TestType', 'BrownForsythe');
+
+% test of mean
+disp('test of mean for N2 and MMP')
+p = ranksum(mean_post, n2_mean_post_by_wormotel, 'tail', 'right')
+p = ranksum(mean_pre, n2_mean_pre_by_wormotel, 'tail', 'right')
+
+%% === Fig3B : Pre vs Post-UV per-strain dot plot ===
+clear; clc; close all;
+
+addpath(fullfile('..', 'helpers'));
+
+load('data_per_worm.mat');
+
+cOrder = colororder;
+Color_postUV = cOrder(4,:);
+
+% === Aggregate per strain ===
+[G, strainList] = findgroups(Strain_names_all);
+
+% --- Quiescence ---
+preUV_Qf_mean = splitapply(@mean, preUV_Qf_all, G);
+postUV_Qf_mean = splitapply(@mean, postUV_Qf_all, G);
+SE_pre_Qf_mean = splitapply(@(x) std(x)/sqrt(numel(x)), preUV_Qf_all, G);
+SE_post_Qf_mean = splitapply(@(x) std(x)/sqrt(numel(x)), postUV_Qf_all, G);
+
+% === Identify N2 and reorder so it plots last ===
+isN2 = contains(string(strainList), 'N2', 'IgnoreCase', true);
+order = [find(~isN2); find(isN2)];
+
+strainList = strainList(order);
+
+% Quiescence
+preUV_Qf_mean  = preUV_Qf_mean(order);
+postUV_Qf_mean = postUV_Qf_mean(order);
+SE_pre_Qf_mean  = SE_pre_Qf_mean(order);
+SE_post_Qf_mean = SE_post_Qf_mean(order);
+
+
+% === Define gene-group colors ===
+geneColors = containers.Map( ...
+    {'N2', 'strd-1', 'cla-1', 'egl-8','aptf-1', 'ceh-17'}, ...
+    {[0.5 0.5 0.5], ...   % N2  (grey)
+     [0.70, 0.00, 0.70], ...   % strd-1 (purple)
+     [0.20, 0.90, 0.20], ...   % cla-1 (green)
+     [1.00, 0.00, 0.00], ...   % egl-8 (red)
+     [1.00, 0.50, 0.00], ...   % aptf-1 (orange)
+     [0.15, 0.50, 0.85]} ...   % ceh-17 (blue)
+);
+
+% === Define shapes per gene ===
+geneShapes = containers.Map( ...
+    {'N2', 'strd-1','cla-1', 'egl-8', 'aptf-1', 'ceh-17'}, ...
+    {'p', 's', '^', 'd', 'v', 'o'} ...
+);
+
+% === Strain → Gene mapping ===
+strainToGene = containers.Map( ...
+    {'N2 UV', ...
+     'RB1771 UV', 'RB1775 UV', ...
+     'VC387 UV', 'RB778 UV', 'RB1777 UV', 'VC596 UV', 'VC631 UV', ...
+     'CB6614 UV', 'RM2221 UV', 'IK777 UV', 'JT47 UV', 'MT1083 UV', ...
+     'HBR232 UV', ...
+     'IB16 UV'}, ...
+    {'N2', ...
+     'strd-1', 'strd-1', ...
+     'cla-1', 'cla-1', 'cla-1', 'cla-1', 'cla-1', ...
+     'egl-8', 'egl-8', 'egl-8', 'egl-8', 'egl-8', ...
+     'aptf-1', ...
+     'ceh-17'} ...
+);
+
+% === Appearance ===
+defaultColor   = [0.7 0.7 0.7];
+baseMarkerSize = 35;
+geneMarkerSize = 70;
+
+% === Legend containers ===
+legendEntries = [];
+legendLabels  = {};
+
+figure('Color','w'); hold on; box on;
+
+% ============================================================
+%   STRAIN ORDER: plot non-N2 first, N2 last
+% ============================================================
+strainList = categories(Strain_names_all);
+
+isN2 = false(size(strainList));
+
+for i = 1:numel(strainList)
+    sName = strainList{i};
+
+    if isKey(strainToGene, sName) && strcmp(strainToGene(sName), 'N2')
+        isN2(i) = true;
+    end
 end
 
-% Annotate number of worms per strain
-for ii = 1:numel(groupNames)
-    yPos = strain_means(ii) - strain_sems(ii) - 0.1*range(ylims);
-    text(ii, yPos, sprintf('%d', strain_counts(ii)), ...
-        'HorizontalAlignment','center','VerticalAlignment','bottom', ...
-        'FontSize', 8, 'Color','k', ...
-        'BackgroundColor','w','Margin',1,'EdgeColor','k','LineWidth',0.8);
+% N2 first → plotted first → appears underneath
+strainList = [strainList(isN2); strainList(~isN2)];
+
+% === legend containers ===
+legendEntries = gobjects(0);
+legendLabels  = {};
+
+% ellipse smoothness
+theta = linspace(0, 2*pi, 120);
+
+% ============================================================
+%   LOOP — one SEM ellipse per wormmotel trial directory
+% ============================================================
+
+N_each_trial = [];
+for s = 1:numel(strainList)
+
+    strainName = strainList{s};
+
+    % all worms for this strain
+    idxStrain = Strain_names_all == strainName;
+
+    x_all   = preUV_Qf_all(idxStrain);
+    y_all   = postUV_Qf_all(idxStrain);
+    dir_all = trialDir_all(idxStrain);
+
+    if isempty(x_all)
+        continue;
+    end
+
+    % gene mapping
+    if isKey(strainToGene, strainName)
+        geneName  = strainToGene(strainName);
+        geneColor = geneColors(geneName);
+    else
+        continue;
+    end
+
+    % unique wormmotel trial folders for this strain
+    uniqueDirs = categories(removecats(dir_all));
+
+    for k = 1:numel(uniqueDirs)
+
+        thisDir = categorical(uniqueDirs(k));
+        idxDir  = dir_all == thisDir;
+
+        xDir = x_all(idxDir);
+        yDir = y_all(idxDir);
+
+        valid = ~isnan(xDir) & ~isnan(yDir);
+        xDir = xDir(valid);
+        yDir = yDir(valid);
+
+        if isempty(xDir)
+            continue;
+        end
+
+        % mean per trial
+        xMean = mean(xDir);
+        yMean = mean(yDir);
+
+        % SEM per trial
+        if numel(xDir) > 1
+            N_each_trial(end+1) = numel(xDir);
+            xSEM = std(xDir) / sqrt(numel(xDir));
+        else
+            xSEM = 0;
+        end
+
+        if numel(yDir) > 1
+            ySEM = std(yDir) / sqrt(numel(yDir));
+        else
+            ySEM = 0;
+        end
+
+        % --- vertical errorbar ---
+        h = errorbar(xMean, yMean, ySEM, ...
+            'Color', geneColor, ...
+            'LineWidth', 1.5, ...
+            'CapSize', 0);
+
+        % --- horizontal errorbar ---
+        errorbar(xMean, yMean, xSEM, ...
+            'horizontal', ...
+            'Color', geneColor, ...
+            'LineWidth', 1.5, ...
+            'CapSize', 0);
+
+        % small center point
+        plot(xMean, yMean, '.', ...
+            'Color', geneColor, ...
+            'MarkerSize', 14);
+
+        % add legend once per gene
+        if ~any(strcmp(legendLabels, geneName))
+            legendEntries(end+1) = h;
+            legendLabels{end+1}  = geneName;
+        end
+    end
 end
 
-ylim([0, ylims(2)*1.08]);
-box off; ylim([0 1]);
-set(gca,'TickLength',[0 0]);
+fprintf('N max = %d\n', max(N_each_trial));
+fprintf('N min = %d\n', min(N_each_trial));
+fprintf('N trial = %d\n', size(N_each_trial, 2));
 
-% Small legend
-hN2  = bar(nan, 'FaceColor', [0 0.7 0]);
-hSig = bar(nan, 'FaceColor', [1 0 0]);
-hNS  = bar(nan, 'FaceColor', [0 0 1]);
-hDot = scatter(nan, nan, 40, 'square', 'MarkerFaceColor','w', 'MarkerEdgeColor','k');
+% ============================================================
+%   AXES / DIAGONAL / STYLE
+% ============================================================
+allVals = [preUV_Qf_all(:); postUV_Qf_all(:)];
+allVals = allVals(~isnan(allVals));
 
-legend([hN2 hSig hNS hDot], ...
-    {'N2','Significant vs N2','Not significant','number of worms'}, ...
-    'FontSize', 8, 'Location', 'northeastoutside', 'Box', 'off');
+lims = [min(allVals), max(allVals)];
 
-close all;
+plot(lims, lims, 'k--', 'LineWidth', 2);
 
-%% === Fig2B, Fig2C, Fig2D, Fig2E, Fig2F, Fig2G ===
-% Cleaned version:
-%   - Heatmap: N2 on top, remaining groups sorted by ascending allele name
-%   - Scatter: N2 first, remaining groups sorted by ascending allele name
+xlim([0 0.4]);
+ylim(lims);
+
+xlabel('Pre-UV quiescence fraction');
+ylabel('Post-UV quiescence fraction');
+
+set(gca, ...
+    'FontSize', 11, ...
+    'LineWidth', 1, ...
+    'TickDir', 'in', ...
+    'Layer', 'top');
+
+grid off;
+
+f = gcf;
+f.Units = 'pixels';
+f.Position = [100 100 800 800];
+pbaspect([1 1 1]);
+
+
+ax = gca; ax.FontSize = 25;
+ax.LineWidth = 2;
+
+hold off;
+
+box off;
+exportgraphics(gca, "Fig3B.svg");
+
+%% === Fig3 per-gene panels: trace heatmap + scatter ===
+% Outputs:  strd-1heat.svg, cla-1heat.svg, egl-8heat.svg
+%           strd-1_scatter.svg, cla-1_scatter.svg, egl-8_scatter.svg
+clear; clc; close all;
+
+addpath(fullfile('..', 'helpers'));
 
 %% ============================================================
 %   STRAIN → GENE MAP
@@ -158,7 +435,7 @@ strainDisplay = containers.Map( ...
     );
 
 %% ============================================================
-%   PATHS
+%   PATHS  --  TODO: set these to your local paths before running
 %% ============================================================
 
 baseDirs = { ...
@@ -428,9 +705,6 @@ for g = 1:numel(geneList)
     set(ax, 'YTick', centers, ...
             'YTickLabel', y_tick_labels);
 
-    % ytickangle(30)
-
-
     % X axis in hours
     xticks_steps = 0:360:size(qALL, 1);
     set(gca, 'XTick', xticks_steps + 1);
@@ -485,18 +759,12 @@ for g = 1:numel(geneList)
         idxS = subT.Strain == sNames(i);
         dates_i = unique(subT.Date(idxS));
 
-        %idxN2 = subT.Strain=="N2 UV" & ismember(subT.Date,dates_i);
         idxN2 = subT.Strain=="N2 UV";
 
         wt_post = subT.Qf_post(idxN2);
         wt_pre  = subT.Qf_pre(idxN2);
         dat_post = subT.Qf_post(idxS);
         dat_pre  = subT.Qf_pre(idxS);
-
-
-        % H0: WT > MUT ; H1: WT < MUT
-        % [~,pPre(i)]  = ttest2(wt_pre, dat_pre, 'Tail', 'both', 'Vartype','unequal');
-        % [~,pPost(i)] = ttest2(wt_post, dat_post, 'Tail', 'both', 'Vartype','unequal');
 
         % Rank sum
         alpha_thresh = 0.01;
@@ -510,12 +778,6 @@ for g = 1:numel(geneList)
 
         disp(sNames(i))
 
-        % fprintf('median of WT pre-UV = %.3f \n', median(wt_pre));
-        % fprintf('median of mutant pre-UV = %.3f \n', median(dat_pre));
-        % 
-        % fprintf('mean of WT pre-UV = %.3f \n', mean(wt_pre));
-        % fprintf('mean of mutant pre-UV = %.3f \n', mean(dat_pre));
-
         [pPre(i), hPre(i)]  = ranksum(wt_pre, dat_pre, 'tail', tail_type, 'alpha', alpha_thresh);
         [pPost(i), hPost(i)] = ranksum(wt_post, dat_post, 'tail', tail_type, 'alpha', alpha_thresh);
 
@@ -526,7 +788,7 @@ for g = 1:numel(geneList)
         fprintf('median dat_post = %.2f\n', median(dat_post));
 
     end
-    
+
     disp('pPre = ');
     disp(pPre);
     disp('\n\n');
@@ -545,9 +807,6 @@ for g = 1:numel(geneList)
 
     qPost = pPost;
     qPre = pPre;
-
-    % qPost = mafdr(pPost,'BHFDR',true);
-    % qPre  = mafdr(pPre,'BHFDR',true);
 
     % Build display labels and sort:
     % N2 first, remaining groups by ascending allele name
@@ -597,28 +856,28 @@ for g = 1:numel(geneList)
     Color_postUV = cOrder(4,:);
 
     yl = [0 1];
-    
+
     % Make sure subT.Strain uses the same order as sNames
     strainCat = categorical(string(subT.Strain), string(sNames));
     groupIdx = grp2idx(strainCat);   % 1..numel(sNames)
-    
+
     % Build one pooled x/y input for a single beeswarm call
     x_pre  = 2*groupIdx - 1;
     x_post = 2*groupIdx;
     x_all  = [x_pre; x_post];
-    
+
     y_all  = [subT.Qf_pre; subT.Qf_post];
-    
+
     % Tick positions
     x_mid = 2*(1:numel(sNames)) - 0.5;
-    
+
     % One color per unique x position
     % x=1,3,5,... -> pre color
     % x=2,4,6,... -> post color
     groupColors = zeros(2*numel(sNames), 3);
     groupColors(1:2:end, :) = repmat(Color_preUV,  numel(sNames), 1);
     groupColors(2:2:end, :) = repmat(Color_postUV, numel(sNames), 1);
-    
+
     % Single beeswarm call
     beeswarm(x_all, y_all, ...
         'corral_style', 'random', ...
@@ -629,9 +888,9 @@ for g = 1:numel(geneList)
         'MarkerFaceColor', '', ...      % leave empty so colormap is used
         'MarkerFaceAlpha', 0.5, ...
         'MarkerEdgeColor', 'w');
-    
+
     ylabel('Quiescence fraction');
-    
+
 
     y_tick_labels = cellstr(displaySortNames);
     % Italicize mutant allele labels but leave N2 plain
@@ -647,7 +906,6 @@ for g = 1:numel(geneList)
     set(ax, 'XTick', x_mid, 'XTickLabel', y_tick_labels);
     xtickangle(20)
 
-    %xtickangle(20);
     box off;
 
     ylim([yl(1) yl(2)]);
@@ -669,8 +927,6 @@ for g = 1:numel(geneList)
             if qPre(i) < 0.05 && sNames(i) ~= "N2 UV"
                 labelPre = [labelPre ' *'];
             end
-            % text(x_pre(i), yl(2)+0.05, labelPre, ...
-            %     'HorizontalAlignment','center','FontSize',12);
         end
 
         if ~isnan(qPost(i))
@@ -678,19 +934,10 @@ for g = 1:numel(geneList)
             if qPost(i) < 0.05 && sNames(i) ~= "N2 UV"
                 labelPost = [labelPost ' *'];
             end
-            % text(x_post(i), yl(2)+0.10, labelPost, ...
-            %     'HorizontalAlignment','center','FontSize',12);
         end
     end
 
-    % hPre  = plot(nan,nan,'o','MarkerFaceColor',Color_preUV,  'MarkerEdgeColor','none');
-    % hPost = plot(nan,nan,'o','MarkerFaceColor',Color_postUV, 'MarkerEdgeColor','none');
-
-    % legend([hPre hPost], {'Pre-UV','Post-UV'}, ...
-    %     'Location','northeast','Box','off');
-
     box off;
-    %title(['Gene Group: ' gene],'FontSize',16,'FontWeight','bold');
 
     f = gcf;
     f.Units = 'pixels';
@@ -705,242 +952,5 @@ for g = 1:numel(geneList)
     pbaspect([1 ratio 1]);
 
     exportgraphics(gca, [gene,'_scatter.svg']);
-
-end
-
-%% ============================================================
-%   Helper functions
-%% ============================================================
-
-function [PAV, t1, pnew] = fracQ(p,qt,spi,ps)
-
-if mod(ps,2)==0
-    ps=ps+1;
-end
-
-pq=p<qt;
-[sizex, sizey]=size(p);
-t1=[1:1/spi:sizex]/3600*spi;
-rois=1:sizey;
-pstart=ceil(ps/2);
-pf=floor(ps/2);
-
-pav=zeros(ceil(sizex/ps),sizey);
-for i=pstart:ps:sizex-ps
-    for j=1:sizey
-        pav((i+pf)/ps,j)=mean(pq((i-pf):(i+pf),j), "omitnan");
-    end
-end
-
-pax=[1:ceil(sizex/ps)]*ps/3600*spi;
-pax2=[1:sizex]/3600*spi;
-PAV=interp2(rois,pax',pav,rois,t1');
-pnew=interp2(rois,pax2',p,rois,t1')/spi;
-
-end
-
-function x = beeswarm(x,y,varargin)
-% function xbee = beeswarm(x,y)
-%
-% Input arguments:
-%   x               column vector of groups
-%   y               column vector of data
-%
-% Optional input arguments:
-%   sort_style      ('nosort' default | 'up' | 'down' | 'fan' | 'rand' | 'square' | 'hex')
-%   corral_style    ('none' default | 'gutter' | 'omit' | 'rand')
-%   dot_size        relative. default = 1
-%   overlay_style   (false default | 'box' | 'sd' | 'ci')
-%   use_current_axes (false default | true)
-%   colormap        (lines default | 'jet' | 'parula' | 'r' | Nx3 matrix)
-%
-% Ian Stevenson, CC-BY 2019
-
-p = inputParser;
-addRequired(p,'x')
-addRequired(p,'y')
-validScalarPosNum = @(x) isnumeric(x) && isscalar(x) && (x > 0);
-addOptional(p,'sort_style','nosort')
-addOptional(p,'corral_style','none')
-addOptional(p,'dot_size',11/sqrt(length(x)),validScalarPosNum)
-addOptional(p,'overlay_style',false)
-addOptional(p,'use_current_axes',false)
-addOptional(p,'colormap','lines')
-addOptional(p,'MarkerFaceColor','')
-addOptional(p,'MarkerFaceAlpha',.5)
-addOptional(p,'MarkerEdgeColor','none')
-parse(p,x,y,varargin{:});
-
-rwid = .05;
-dcut = 6;
-nxloc = 512;
-chanwid = .9;
-yl = [min(y) max(y)];
-asp_rat = 1;
-keep_hold = false;
-
-if isfinite(p.Results.dot_size)
-    if ~p.Results.use_current_axes
-        scatter(x,y);
-        xl=[min(x)-.5 max(x)+.5];
-    else
-        xl=xlim();
-    end
-    yl=ylim();
-    pasp_rat = get(gca,'PlotBoxAspectRatio');
-    asp_rat = pasp_rat(1)/pasp_rat(2);
-
-    pf = get(gcf,'Position');
-    pa = get(gca,'Position');
-    as = pf(3:4).*pa(3:4);
-    dcut = dcut*sqrt(p.Results.dot_size)/as(1)*(range(unique(x))+1);
-    if ~ishold
-        cla
-    else
-        keep_hold = true;
-    end
-end
-
-yorig=y;
-switch lower(p.Results.sort_style)
-    case 'up'
-        [y,sid]=sort(y);
-    case 'fan'
-        [~,sid]=sort(abs(y-mean(y)));
-        sid=[sid(1:2:end); sid(2:2:end)];
-        y=y(sid);
-    case 'down'
-        [y,sid]=sort(y,'descend');
-    case 'rand'
-        sid=randperm(length(y));
-        y=y(sid);
-    case 'square'
-        nxloc=.9/dcut;
-        edges = linspace(min(yl),max(yl),ceil((range(x)+1)*chanwid*nxloc/asp_rat));
-        [~,e,b]=histcounts(y,edges);
-        y=e(b)'+mean(diff(e))/2;
-        [y,sid]=sort(y);
-    case 'hex'
-        nxloc=.9/dcut;
-        edges = linspace(min(yl),max(yl),ceil((range(x)+1)*chanwid*nxloc/sqrt(1-.5.^2)/asp_rat));
-        [n,e,b]=histcounts(y,edges);
-        oddmaj=0;
-        if sum(mod(n(1:2:end),2)==1)>sum(mod(n(2:2:end),2)==1)
-            oddmaj=1;
-        end
-        y=e(b)'+mean(diff(e))/2;
-        [y,sid]=sort(y);
-        b=b(sid);
-    otherwise
-        sid=1:length(y);
-end
-
-x=x(sid);
-yorig=yorig(sid);
-[ux,~,ic] = unique(x);
-rmult=5;
-
-for i=1:length(ux)
-    fid = find(ic==i);
-
-    xi = linspace(-chanwid/2*rmult,chanwid/2*rmult,nxloc*rmult+(mod(nxloc*rmult,2)==0))'+ux(i);
-    zy=(y(fid)-min(yl))/(max(yl)-min(yl))/asp_rat*(range(ux)+1)*chanwid;
-    D0=squareform(pdist(zy))<dcut*2;
-
-    if length(fid)>1
-        for j=1:length(fid)
-            if strcmp(lower(p.Results.sort_style),'hex')
-                xi = linspace(-chanwid/2*rmult,chanwid/2*rmult,nxloc*rmult+(mod(nxloc*rmult,2)==0))'+ux(i);
-                if mod(b(fid(j)),2)==oddmaj
-                    xi = linspace(-chanwid/2*rmult,chanwid/2*rmult,nxloc*rmult+(mod(nxloc*rmult,2)==0))'+ux(i)+mean(diff(xi))/2;
-                end
-            end
-            zid = D0(j,1:j-1);
-            e = (xi-ux(i)).^2;
-            if ~strcmp(lower(p.Results.sort_style),'hex') && ~strcmp(lower(p.Results.sort_style),'square')
-                if sum(zid)>0
-                    D = pdist2([xi ones(length(xi),1)*zy(j)], [x(fid(zid)) zy(zid)]);
-                    D(D<=dcut)=Inf;
-                    D(D>dcut & isfinite(D))=0;
-                    e = e + sum(D,2) + randn(1)*10e-6;
-                end
-            else
-                if sum(zid)>0
-                    D = pdist2([xi ones(length(xi),1)*zy(j)], [x(fid(zid)) zy(zid)]);
-                    D(D==0)=Inf;
-                    D(D>dcut & isfinite(D))=0;
-                    e = e + sum(D,2) + randn(1)*10e-6;
-                end
-            end
-
-            if strcmp(lower(p.Results.sort_style),'one')
-                e(xi<ux(i))=Inf;
-            end
-            [~,mini] = min(e);
-            if mini==1 && rand(1)>.5, mini=length(xi); end
-            x(fid(j)) = xi(mini);
-        end
-    end
-end
-
-if strcmp(lower(p.Results.sort_style),'randn')
-    x=ux(ic)+randn(size(ic))/4;
-end
-
-out_of_range = abs(x-ux(ic))>chanwid/2;
-switch lower(p.Results.corral_style)
-    case 'gutter'
-        id = (x-ux(ic))>chanwid/2;
-        x(id)=chanwid/2+ux(ic(id));
-        id = (x-ux(ic))<-chanwid/2;
-        x(id)=-chanwid/2+ux(ic(id));
-    case 'omit'
-        x(out_of_range)=NaN;
-    case 'random'
-        x(out_of_range)=ux(ic(out_of_range))+rand(sum(out_of_range),1)*chanwid-chanwid/2;
-end
-
-if isfinite(p.Results.dot_size)
-    if isnumeric(p.Results.colormap)
-        cmap=p.Results.colormap;
-    else
-        cmap = feval(p.Results.colormap,length(ux));
-    end
-    for i=1:length(ux)
-        if isempty(p.Results.MarkerFaceColor')
-            scatter(x(ic==i),y(ic==i),p.Results.dot_size*36,'filled','MarkerFaceAlpha', ...
-                p.Results.MarkerFaceAlpha,'MarkerEdgeColor',p.Results.MarkerEdgeColor,'MarkerFaceColor',cmap(i,:))
-        else
-            scatter(x(ic==i),y(ic==i),p.Results.dot_size*36,'filled','MarkerFaceAlpha', ...
-                p.Results.MarkerFaceAlpha,'MarkerEdgeColor',p.Results.MarkerEdgeColor,'MarkerFaceColor',p.Results.MarkerFaceColor)
-        end
-        hold on
-        iqr = prctile(yorig(ic==i),[25 75]);
-        switch lower(p.Results.overlay_style)
-            case 'box'
-                rectangle('Position',[ux(i)-rwid iqr(1) 2*rwid iqr(2)-iqr(1)],'EdgeColor','k','LineWidth',2)
-                line([ux(i)-rwid ux(i)+rwid],[1 1]*median(yorig(ic==i)),'LineWidth',3,'Color',cmap(i,:))
-            case 'sd'
-                % erbar_color = cmap(i,:);
-                erbar_color = 'b';
-                line([1 1]*ux(i),mean(yorig(ic==i))+[-1 1]*std(yorig(ic==i)),'Color',erbar_color,'LineWidth',4)
-                line([ux(i)-4*rwid ux(i)+4*rwid],[1 1]*mean(yorig(ic==i)),'LineWidth',4,'Color',erbar_color)
-            case 'se'
-                line([1 1]*ux(i),mean(yorig(ic==i))+[-1 1]*std(yorig(ic==i))/sqrt(sum(ic==i)),'Color',cmap(i,:),'LineWidth',4)
-                line([ux(i)-2*rwid ux(i)+2*rwid],[1 1]*mean(yorig(ic==i)),'LineWidth',4,'Color',cmap(i,:))
-            case 'ci'
-                line([1 1]*ux(i),mean(yorig(ic==i))+[-1 1]*std(yorig(ic==i))/sqrt(sum(ic==i))*tinv(0.975,sum(ic==i)-1),'Color',cmap(i,:),'LineWidth',2)
-                line([ux(i)-2*rwid ux(i)+2*rwid],[1 1]*mean(yorig(ic==i)),'LineWidth',3,'Color',cmap(i,:))
-        end
-    end
-    hold off
-    if keep_hold
-        hold on
-    end
-    xlim(xl)
-    ylim(yl)
-end
-
-x(sid)=x;
 
 end
