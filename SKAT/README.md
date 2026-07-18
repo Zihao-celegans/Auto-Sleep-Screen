@@ -89,11 +89,26 @@ plink --vcf MMP.vcf \
 
 ## Preparing `gene_variants.txt` from a VCF
 
-`gene_variants.txt` is a header-stripped, coding-variant-filtered version of the VCF. Variants must have `SN=` or `CODING=` tags in the INFO field for the SSID script to assign them to genes.
+`gene_variants.txt` is a header-stripped, **coding / protein-altering** subset of the VCF
+(191,938 variants; the per-strain genotype columns are dropped). A variant is kept if it is:
+
+- a **nonsynonymous** SNV (`AAC=X->Y`, X≠Y — missense or stop), **or**
+- an **induced indel** (`INDEL=` present), **or**
+- a **structural variant** with a coding annotation (`SVTYPE=` and `CODING=`),
+
+and maps to a **real gene** (`SN=` is a gene, not a chromosome name / empty / `E_…` / `cTel…`).
+Intergenic, intronic, synonymous, UTR-only, ncRNA, and unassigned variants are dropped.
+
+Generate it with the provided script (regenerates the deposited file byte-for-byte):
 
 ```bash
-grep -v "^#" MMP.vcf | grep -E "SN=|CODING=" > inputs/gene_variants.txt
+python3 scripts/make_gene_variants.py --vcf MMP.vcf --out inputs/gene_variants.txt \
+        --verify inputs/gene_variants.txt   # optional: check against a reference
 ```
+
+> A plain `grep -E "SN=|CODING="` does **not** reproduce `gene_variants.txt` — it keeps
+> ~838k lines (all annotated variants, including synonymous and intronic). The coding /
+> nonsynonymous filter above is required. See `PIPELINE.md` for the full data flow.
 
 ---
 
@@ -102,7 +117,7 @@ grep -v "^#" MMP.vcf | grep -E "SN=|CODING=" > inputs/gene_variants.txt
 | File | Format | Notes |
 |---|---|---|
 | `MMP.bed` / `MMP.bim` / `MMP.fam` | Binary PLINK | FAM col 6 = phenotype; strain order must match BED |
-| `gene_variants.txt` | Tab-separated VCF body (no header) | Requires `SN=` or `CODING=` in INFO field |
+| `gene_variants.txt` | Tab-separated VCF body (no header), coding/nonsynonymous only | Built by `scripts/make_gene_variants.py`; see "Preparing gene_variants.txt" |
 | `combined_phenotype.csv` | CSV with header `Strain,Phenotype` | Normalized continuous trait values |
 
 **Critical:** The strain order in `MMP.fam` must match the sample encoding in `MMP.bed`. Never reorder the FAM independently — `run_pipeline.R` uses `left_join` (keyed on FAM) to guarantee this when updating phenotypes.
