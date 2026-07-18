@@ -18,7 +18,7 @@ SKAT/
 │   ├── Make_SSID_file.R         # Command-line SSID generator
 │   └── SKAT_prelim.R            # Interactive SKAT analysis
 └── outputs/
-    ├── SKAT_all-pvals.results         # P-values for all genes
+    ├── SKAT_all-pvals.results         # P-values for all 19,749 defined gene sets (18,070 testable)
     ├── SKAT_all-qvals.results         # P-values + FDR q-values, sorted
     └── SKAT_all_reduced_940.results   # Final variants
 ```
@@ -111,9 +111,18 @@ grep -v "^#" MMP.vcf | grep -E "SN=|CODING=" > inputs/gene_variants.txt
 
 ## Output Files
 
+See [`outputs/README.md`](outputs/README.md) for full per-column descriptions and the
+gene-count breakdown.
+
 | File | Contents |
 |---|---|
-| `SKAT_all-pvals.results` | SetID, P.value, N.Marker.All, N.Marker.Test for all genes |
+| `SKAT_all-pvals.results` | SetID, P.value, N.Marker.All, N.Marker.Test for all 19,749 defined gene sets (of which **18,070 are testable** — see note) |
 | `SKAT_all-qvals.results` | Same + FDR Q.value (fdrtool), sorted by P.value |
-| `SKAT_all_reduced_940.results` | Genes with ≥x variants, sorted by P.value — **use this for final results** |
+| `SKAT_all_reduced_940.results` | Genes with ≥4 variants, sorted by P.value — **use this for final results** |
+
+> **Note on gene counts:** 19,749 gene sets are *defined*, but only **18,070** contain at
+> least one testable (polymorphic) variant and receive a real P-value. The remaining
+> **1,679** have no testable marker (`N.Marker.Test = 0`, `P = 1`) and are unranked. Genes
+> absent entirely (e.g. *flp-13* / F33D4.3) carry no qualifying coding variant in the
+> analyzed MMP strains. See [`outputs/README.md`](outputs/README.md).
 
