@@ -1,0 +1,16 @@
+gene	SetID	P.value	N.Marker.All	N.Marker.Test	rank_of_tested	percentile	status
+aptf-1	F21A9.2	0.06277	8	5	1558	8.6	tested
+let-23	ZK1067.1	0.8877	25	10	16016	88.6	tested
+npr-1	C39E6.6	0.7395	6	2	13445	74.4	tested
+egl-4	F55A8.2	0.01531	23	12	636	3.5	tested
+flp-11	F33D4.1	0.7339	11	3	13351	73.9	tested
+flp-13	F33D4.3	NA	NA	NA	NA	NA	ABSENT_no_qualifying_variant
+flp-18	Y98D8B.5	NA	NA	NA	NA	NA	ABSENT_no_qualifying_variant
+lin-3	F36H1.4	0.3598	9	3	6822	37.8	tested
+pdfr-1	C13B9.4	0.4218	14	5	7864	43.5	tested
+ceh-17	ZC64.3	0.605	17	5	11105	61.5	tested
+unc-31	ZK897.1	0.8772	27	10	15816	87.5	tested
+nlp-22	C05E7.2	0.1908	4	2	3857	21.3	tested
+ntc-1	ZC64.4	0.3121	10	7	6003	33.2	tested
+sel-12	F35H12.3	0.5999	10	5	11022	61.0	tested
+daf-16	R13H8.1	0.01711	22	9	687	3.8	tested
