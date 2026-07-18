@@ -28,10 +28,14 @@ Two further filtered counts appear in the paper/pipeline:
 > 1,679 untested gene sets carrying a placeholder P = 1. They are not a ranking of all
 > 19,749 genes.
 
-**Genes absent from these files** (e.g. *flp-13* / F33D4.3) carry **no qualifying coding
-variant** in the MMP strains analyzed under the `SN=` / `CODING=` INFO filter, so no gene
-set was defined for them. This is an inherent limitation of association testing on a fixed
-mutation panel: SKAT can only test genes that the panel actually mutates.
+**Genes absent from these files** carry **no nonsynonymous coding variant** in the MMP,
+so no gene set was defined for them. The variant list `gene_variants.txt` keeps only
+protein-altering variants (nonsynonymous SNVs, induced indels, coding structural variants;
+see `PIPELINE.md` / `scripts/make_gene_variants.py`). For example, *flp-13* (F33D4.3) has
+exactly three MMP variants — two introns (`gk595643`, `gk633909`) and one non-coding exon
+variant (`gk649784`) — none of which is a nonsynonymous coding change, so flp-13 gets no
+gene set and is never tested. This is an inherent limitation of association testing on a
+fixed mutation panel: SKAT can only test genes the panel mutates in a protein-altering way.
 
 ## Files
 
