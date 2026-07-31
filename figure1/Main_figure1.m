@@ -258,7 +258,7 @@ ranksum(N2_pre_UV, aptf_1_pre_UV, 'tail', 'right')
 ranksum(N2_post_UV, aptf_1_post_UV, 'tail', 'right')
 
 fprintf('N2 vs ceh-17\n')
-ranksum(N2_pre_UV, ceh_17_pre_UV, 'tail', 'both')
+ranksum(N2_pre_UV, ceh_17_pre_UV, 'tail', 'right')
 ranksum(N2_post_UV, ceh_17_post_UV, 'tail', 'right')
 
 ylim([0, 1]);
