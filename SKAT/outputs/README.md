@@ -3,7 +3,7 @@
 SKAT gene-level association results for the MMP SIS screen. Files are whitespace-delimited
 with a header row.
 
-## Gene counts (read this first)
+## Gene counts
 
 We defined 19,749 gene sets - one per gene that has at least one protein-altering variant
 in our filtered variant list (see below).
