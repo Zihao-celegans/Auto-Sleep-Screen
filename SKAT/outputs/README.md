@@ -24,8 +24,8 @@ Of these, **18,070 were tested** and given a P-value.
 Before running SKAT, we kept only these variants: nonsynonymous SNVs, coding indels, and coding structural variants. We removed everything else:
 synonymous, intronic, intergenic, UTR, and non-coding-RNA variants (see the top-level `README.md`
 and `scripts/make_gene_variants.py`). Genes mutated only
-by non-coding or silent variants drop out. For example, *flp-13* (F33D4.3) **is** mutated in the
-MMP — it has three variants — but all three are non-coding, so our filter removed them and no gene set was built for it. 
+by non-coding or silent variants drop out. For example, *flp-13* (F33D4.3) is mutated in the
+MMP. It has three variants but all three are non-coding, so our filter removed them and no gene set was built for it. 
 
 ## Files
 
