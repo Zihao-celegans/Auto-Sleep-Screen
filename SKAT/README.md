@@ -135,7 +135,7 @@ python3 scripts/make_gene_variants.py --vcf MMP.vcf --out inputs/gene_variants.t
 
 This reproduces the deposited `gene_variants.txt` exactly.
 
-> A plain `grep` for coding tags does **not** reproduce this file — it keeps the synonymous and
+> A plain `grep` for coding tags does not reproduce this file. It keeps the synonymous and
 > intronic variants too. Use the script.
 >
 > This filter is also why some genes never appear in the results. For example, *flp-13* is
