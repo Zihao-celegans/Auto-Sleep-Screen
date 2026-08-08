@@ -1,73 +1,52 @@
 # Outputs — file and column descriptions
 
-This folder contains the SKAT gene-level association results for the MMP SIS screen.
-Each file is whitespace-delimited with a header row.
+SKAT gene-level association results for the MMP SIS screen. Files are whitespace-delimited
+with a header row.
 
 ## Gene counts (read this first)
 
-The gene-set definition (`MMP.SSID`) defines **19,749 gene sets** — one per gene that
-has at least one annotated coding variant in the source VCF.
+We defined **19,749 gene sets** — one per gene that has at least one protein-altering variant
+in our filtered variant list (see below).
 
-Not every defined gene set can be tested. SKAT drops variants that are monomorphic
-across the analyzed strains, so a gene set can end up with zero testable markers:
+Of these, **18,070 were tested** and given a P-value. 
 
-| Category | Count | Meaning |
-|---|---|---|
-| Gene sets defined | 19,749 | one per gene with ≥1 annotated coding variant |
-| Gene sets **tested** (`N.Marker.Test` > 0) | 18,070 | received a real SKAT P-value and are ranked |
-| Gene sets **untested** (`N.Marker.Test` = 0) | 1,679 | no polymorphic marker in the analyzed strains; assigned P = 1, **not ranked** |
-
-Two further filtered counts appear in the paper/pipeline:
-
-| Number | Definition |
+| Count | Meaning |
 |---|---|
-| 15,786 | `SKAT_all_reduced_940.results` — genes with `N.Marker.All ≥ 4` (≥4 *annotated* variants) |
-| 6,663 | genes with `N.Marker.Test ≥ 5` (≥5 *testable/polymorphic* variants) |
+| 19,749 | gene sets defined |
+| 18,070 | tested (`N.Marker.Test > 0`) — the ranked list |
+| 1,679 | not tested (`N.Marker.Test = 0`, P = 1) |
 
-> The results are therefore a **ranked list of the 18,070 tested gene sets**, padded with
-> 1,679 untested gene sets carrying a placeholder P = 1. They are not a ranking of all
-> 19,749 genes.
+> **In short:** the results rank the 18,070 tested genes. The 1,679 untested genes (P = 1) sit
+> at the bottom as placeholders — the list is not a ranking of all 19,749 genes.
 
-**Genes absent from these files** carry **no nonsynonymous coding variant** in the MMP,
-so no gene set was defined for them. The variant list `gene_variants.txt` keeps only
-protein-altering variants (nonsynonymous SNVs, induced indels, coding structural variants;
-see `PIPELINE.md` / `scripts/make_gene_variants.py`). For example, *flp-13* (F33D4.3) has
-exactly three MMP variants — two introns (`gk595643`, `gk633909`) and one non-coding exon
-variant (`gk649784`) — none of which is a nonsynonymous coding change, so flp-13 gets no
-gene set and is never tested. This is an inherent limitation of association testing on a
-fixed mutation panel: SKAT can only test genes the panel mutates in a protein-altering way.
+## Why some genes are missing entirely
+
+Before running SKAT, we kept only these variants: nonsynonymous SNVs, coding indels, and coding structural variants. We removed everything else:
+synonymous, intronic, intergenic, UTR, and non-coding-RNA variants (see the top-level `README.md`
+and `scripts/make_gene_variants.py`). Genes mutated only
+by non-coding or silent variants drop out. For example, *flp-13* (F33D4.3) **is** mutated in the
+MMP — it has three variants — but all three are non-coding, so our filter removed them and no gene set was built for it. 
 
 ## Files
 
 ### `SKAT_all-pvals.results`
-All 19,749 gene sets in **alphabetical SetID order** (as returned by `SKAT.SSD.All`).
+All 19,749 gene sets
 
 | Column | Description |
 |---|---|
-| `SetID` | Gene model / sequence name (e.g. `ZK1067.1`) |
-| `P.value` | SKAT association P-value (1 for untested sets) |
-| `N.Marker.All` | Variants assigned to the gene set |
-| `N.Marker.Test` | Variants actually used (polymorphic in analyzed strains); **0 = untested** |
+| `SetID` | Gene sequence name (e.g. `ZK1067.1`) |
+| `P.value` | SKAT P-value (1 if untested) |
+| `N.Marker.All` | Variants assigned to the gene |
+| `N.Marker.Test` | Variants actually used by SKAT (**0 = untested**) |
 
 ### `SKAT_all-qvals.results`
-Same rows as above **sorted ascending by P.value**, with an added FDR column.
-
-| Column | Description |
-|---|---|
-| `SetID`, `P.value`, `N.Marker.All`, `N.Marker.Test` | as above |
-| `Q.value` | FDR q-value from `fdrtool` (`cutoff.method = "fndr"`) |
-
-Because the 1,679 untested sets all have P = 1, they sort to the bottom; the meaningful
-ranking is over the 18,070 tested sets above them.
+Same rows, sorted by P-value, plus an FDR `Q.value` (`fdrtool`). The 1,679 untested genes (P = 1)
+sort to the bottom; the real ranking is the tested genes above them.
 
 ### `SKAT_all_reduced_940.results`
-Restricted to gene sets whose gene had **≥ 4 annotated variants** in the SSID, then
-re-run and sorted by P.value with fresh FDR q-values. **This is the file used for the
-final results.** (`940` refers to the 939-strain phenotype panel used.)
+Genes with ≥4 annotated variants, re-run and sorted by P-value with fresh q-values. This is the filter found in original SKAT analysis. We found our own threshold by analyzing the median and mean percentile rankings.
 
-Note: this file still contains 343 rows with `N.Marker.Test = 0` — genes that met the
-≥4-annotated-variant threshold but whose variants were monomorphic in the analyzed
-strains. Treat only rows with `N.Marker.Test > 0` as tested.
+
 
 ## Reproducing
-See the top-level `README.md`. Run `Rscript scripts/run_pipeline.R` from the repo root.
+Run `Rscript scripts/run_pipeline.R` from the repo root. See the top-level `README.md`.
