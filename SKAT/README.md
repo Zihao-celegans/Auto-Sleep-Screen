@@ -1,4 +1,4 @@
-# SKAT MMP Analysis — data flow from input to output
+# SKAT MMP Analysis
 
 This runs a SKAT (Sequence Kernel Association Test) analysis linking gene-level variants in the
 Million Mutation Project (MMP) *C. elegans* strains to a continuous sleep phenotype. It walks
