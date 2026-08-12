@@ -12,6 +12,14 @@ addpath(fullfile('..', 'helpers'));
 
 load('robot_MMP_Qf.mat')
 load('sleep_data_cleaned.mat')
+
+%% correct known strain-name errors in Kerry's dataset
+strain_names(strcmpi(strain_names, 'VC20497C')) = {'VC20497'};
+idx_VC20750N = strcmpi(strain_names, 'VC20750 N'); % duplicate mislabel of VC20750, drop it
+strain_names(idx_VC20750N) = [];
+stressed_quiescence_mean(idx_VC20750N) = [];
+unstressed_quiescence_mean(idx_VC20750N) = [];
+
 stressed_quiescence_mean_kerry = stressed_quiescence_mean'/60;
 unstressed_quiescence_mean_kerry = unstressed_quiescence_mean'/60;
 load('sleep_data_N2_Kerry')
@@ -55,6 +63,16 @@ idx_to_remove = (merge_mean_Qf_preUV == 0) .* (merge_mean_Qf_postUV == 0);
 
 merge_mean_Qf_preUV_filtered = merge_mean_Qf_preUV(~idx_to_remove);
 merge_mean_Qf_postUV_filtered = merge_mean_Qf_postUV(~idx_to_remove);
+
+%% === Supplemental table : per-strain pre/post-UV quiescence underlying Fig2A/B ===
+
+ranked_MMP_name_list_clean = erase(cellstr(ranked_MMP_name_list), ' UV');
+merge_MMP_Names = upper([unique_MMP_Names_kerry; ranked_MMP_name_list_clean]);
+merge_MMP_Names_filtered = merge_MMP_Names(~idx_to_remove);
+
+supp_table_Fig2 = table(merge_MMP_Names_filtered, merge_mean_Qf_preUV_filtered, merge_mean_Qf_postUV_filtered, ...
+    'VariableNames', {'Strain_Name', 'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
+writetable(supp_table_Fig2, 'Fig2_MMP_quiescence_data.csv');
 
 % Histogram of the mean quiescence for MMPs
 edges= [0:0.03:1];

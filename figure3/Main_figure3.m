@@ -44,6 +44,14 @@ resultsTable2 = resultsTable(ismember(resultsTable.Strain, strainInfo.StrainName
 mean_pre  = splitapply(@mean, resultsTable2.Qf_pre, G);
 mean_post = splitapply(@mean, resultsTable2.Qf_post, G);
 
+%% === Supplemental table : per-strain pre/post-UV quiescence underlying Fig3A ===
+strain_names_fig3 = erase(cellstr(groupNames), ' UV');
+isN2_fig3 = strcmpi(strain_names_fig3, 'N2');
+
+supp_table_Fig3 = table(strain_names_fig3(~isN2_fig3), mean_pre(~isN2_fig3), mean_post(~isN2_fig3), ...
+    'VariableNames', {'Strain_Name', 'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
+writetable(supp_table_Fig3, 'Fig3_MMP_quiescence_data.csv');
+
 %% Reconstruct N2 UV wormotels from ORIGINAL unfiltered table
 dates = unique(resultsTable.Date);
 
