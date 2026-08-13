@@ -70,8 +70,14 @@ ranked_MMP_name_list_clean = erase(cellstr(ranked_MMP_name_list), ' UV');
 merge_MMP_Names = upper([unique_MMP_Names_kerry; ranked_MMP_name_list_clean]);
 merge_MMP_Names_filtered = merge_MMP_Names(~idx_to_remove);
 
-supp_table_Fig2 = table(merge_MMP_Names_filtered, merge_mean_Qf_preUV_filtered, merge_mean_Qf_postUV_filtered, ...
-    'VariableNames', {'Strain_Name', 'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
+Genotype = repmat({'MMP'}, numel(merge_MMP_Names_filtered), 1);
+Identifier = strcat('https://cgc.umn.edu/strain/', merge_MMP_Names_filtered);
+Source = repmat({'Caenorhabditis Genetics Center'}, numel(merge_MMP_Names_filtered), 1);
+
+supp_table_Fig2 = table(merge_MMP_Names_filtered, Genotype, Identifier, Source, ...
+    merge_mean_Qf_preUV_filtered, merge_mean_Qf_postUV_filtered, ...
+    'VariableNames', {'Strain_Name', 'Genotype', 'Identifier', 'Source', ...
+    'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
 writetable(supp_table_Fig2, 'Fig2_MMP_quiescence_data.csv');
 
 % Histogram of the mean quiescence for MMPs
