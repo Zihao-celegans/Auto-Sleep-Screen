@@ -70,14 +70,19 @@ ranked_MMP_name_list_clean = erase(cellstr(ranked_MMP_name_list), ' UV');
 merge_MMP_Names = upper([unique_MMP_Names_kerry; ranked_MMP_name_list_clean]);
 merge_MMP_Names_filtered = merge_MMP_Names(~idx_to_remove);
 
+% unique_MMP_Names_kerry strains were screened by a human; the rest by the robot
+merge_Screen_Method = [repmat({'human'}, numel(unique_MMP_Names_kerry), 1); ...
+    repmat({'robot'}, numel(ranked_MMP_name_list_clean), 1)];
+merge_Screen_Method_filtered = merge_Screen_Method(~idx_to_remove);
+
 Genotype = repmat({'MMP'}, numel(merge_MMP_Names_filtered), 1);
 Identifier = strcat('https://cgc.umn.edu/strain/', merge_MMP_Names_filtered);
 Source = repmat({'Caenorhabditis Genetics Center'}, numel(merge_MMP_Names_filtered), 1);
 
 supp_table_Fig2 = table(merge_MMP_Names_filtered, Genotype, Identifier, Source, ...
-    merge_mean_Qf_preUV_filtered, merge_mean_Qf_postUV_filtered, ...
+    merge_Screen_Method_filtered, merge_mean_Qf_preUV_filtered, merge_mean_Qf_postUV_filtered, ...
     'VariableNames', {'Strain_Name', 'Genotype', 'Identifier', 'Source', ...
-    'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
+    'Screened_by', 'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
 writetable(supp_table_Fig2, 'Fig2_MMP_quiescence_data.csv');
 
 % Histogram of the mean quiescence for MMPs
