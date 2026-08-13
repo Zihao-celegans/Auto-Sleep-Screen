@@ -46,11 +46,24 @@ mean_post = splitapply(@mean, resultsTable2.Qf_post, G);
 
 %% === Supplemental table : per-strain pre/post-UV quiescence underlying Fig3A ===
 strain_names_fig3 = erase(cellstr(groupNames), ' UV');
-isN2_fig3 = strcmpi(strain_names_fig3, 'N2');
 
-supp_table_Fig3 = table(strain_names_fig3(~isN2_fig3), mean_pre(~isN2_fig3), mean_post(~isN2_fig3), ...
-    'VariableNames', {'Strain_Name', 'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
-writetable(supp_table_Fig3, 'Fig3_MMP_quiescence_data.csv');
+% Genotype/Identifier/Source looked up from a local copy of Table_S1's
+% candidate_screen tab (candidate_screen_strain_info.csv), so this script
+% does not depend on a file outside the repo.
+candidateScreen = readtable('candidate_screen_strain_info.csv');
+
+[isFound, locS1] = ismember(lower(strain_names_fig3), lower(candidateScreen.StrainName));
+Genotype = repmat({''}, numel(strain_names_fig3), 1);
+Identifier = repmat({''}, numel(strain_names_fig3), 1);
+Source = repmat({''}, numel(strain_names_fig3), 1);
+Genotype(isFound) = candidateScreen.Genotype(locS1(isFound));
+Identifier(isFound) = candidateScreen.Identifier(locS1(isFound));
+Source(isFound) = candidateScreen.Source(locS1(isFound));
+
+supp_table_Fig3 = table(strain_names_fig3, Genotype, Identifier, Source, mean_pre, mean_post, ...
+    'VariableNames', {'Strain_Name', 'Genotype', 'Identifier', 'Source', ...
+    'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
+writetable(supp_table_Fig3, 'Fig3_mutants_quiescence_data.csv');
 
 %% Reconstruct N2 UV wormotels from ORIGINAL unfiltered table
 dates = unique(resultsTable.Date);
