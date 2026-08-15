@@ -20,6 +20,16 @@ end
 mmpScreen = readtable(fig2Csv);
 candidateScreen = readtable(fig3Csv);
 
+% readtable treats the "NA" text in SKAT_Rank_Percentile as a missing
+% numeric value (NaN), which writetable then exports as a blank cell.
+% Restore "NA" as literal text so it survives into the xlsx.
+pct = candidateScreen.SKAT_Rank_Percentile;
+isMissingPct = isnan(pct);
+pctStr = strings(numel(pct), 1);
+pctStr(~isMissingPct) = string(pct(~isMissingPct));
+pctStr(isMissingPct) = "NA";
+candidateScreen.SKAT_Rank_Percentile = pctStr;
+
 writetable(mmpScreen, outFile, 'Sheet', 'MMP_screen');
 writetable(candidateScreen, outFile, 'Sheet', 'candidate_screen');
 

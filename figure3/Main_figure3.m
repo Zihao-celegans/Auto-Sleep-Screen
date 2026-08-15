@@ -101,6 +101,15 @@ for i = 1:numel(Genotype)
     SKAT_Rank_Percentile(i) = lookupSkatPercentile(Genotype{i}, byCommon, bySetid, geneAliases);
 end
 
+% Write missing percentiles (e.g. N2, which has no mutant gene) as "NA".
+% (string(NaN) yields a <missing> string, not the text "NaN", so build
+% the string array manually rather than converting NaNs and re-matching.)
+isMissingPct = isnan(SKAT_Rank_Percentile);
+pctStr = strings(numel(SKAT_Rank_Percentile), 1);
+pctStr(~isMissingPct) = string(SKAT_Rank_Percentile(~isMissingPct));
+pctStr(isMissingPct) = "NA";
+SKAT_Rank_Percentile = pctStr;
+
 supp_table_Fig3 = table(strain_names_fig3, Genotype, Identifier, Source, mean_pre, mean_post, SKAT_Rank_Percentile, ...
     'VariableNames', {'Strain_Name', 'Genotype', 'Identifier', 'Source', ...
     'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction', 'SKAT_Rank_Percentile'});
