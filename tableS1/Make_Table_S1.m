@@ -18,17 +18,13 @@ if isfile(outFile)
 end
 
 mmpScreen = readtable(fig2Csv);
-candidateScreen = readtable(fig3Csv);
 
-% readtable treats the "NA" text in SKAT_Rank_Percentile as a missing
-% numeric value (NaN), which writetable then exports as a blank cell.
-% Restore "NA" as literal text so it survives into the xlsx.
-pct = candidateScreen.SKAT_Rank_Percentile;
-isMissingPct = isnan(pct);
-pctStr = strings(numel(pct), 1);
-pctStr(~isMissingPct) = string(pct(~isMissingPct));
-pctStr(isMissingPct) = "NA";
-candidateScreen.SKAT_Rank_Percentile = pctStr;
+% Force SKAT_Rank_Percentile to import as text: readtable auto-detects it
+% as numeric (since most rows are a single number) and would otherwise
+% convert both "NA" and multi-locus values like "45.1; 32.97" to NaN.
+fig3Opts = detectImportOptions(fig3Csv);
+fig3Opts = setvartype(fig3Opts, 'SKAT_Rank_Percentile', 'string');
+candidateScreen = readtable(fig3Csv, fig3Opts);
 
 writetable(mmpScreen, outFile, 'Sheet', 'MMP_screen');
 writetable(candidateScreen, outFile, 'Sheet', 'candidate_screen');

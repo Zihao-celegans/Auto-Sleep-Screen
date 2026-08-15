@@ -32,10 +32,19 @@ skatCommon = string(skat.Common_name);
 
 byCommon = containers.Map('KeyType', 'char', 'ValueType', 'double');
 bySetid  = containers.Map('KeyType', 'char', 'ValueType', 'double');
+
+% Canonical-gene-ID maps (SetID is unique per gene; Common_name is not
+% always present), used to count unique genes regardless of whether a
+% strain's Genotype references the gene by Common_name or SetID.
+commonToSetid = containers.Map('KeyType', 'char', 'ValueType', 'char');
+setidToSetid  = containers.Map('KeyType', 'char', 'ValueType', 'char');
+
 for i = 1:height(skat)
     bySetid(char(skatSetID(i))) = skat.Percentile(i);
+    setidToSetid(char(skatSetID(i))) = char(skatSetID(i));
     if skatCommon(i) ~= "N.A." && ~isKey(byCommon, char(skatCommon(i)))
         byCommon(char(skatCommon(i))) = skat.Percentile(i);
+        commonToSetid(char(skatCommon(i))) = char(skatSetID(i));
     end
 end
 
@@ -96,24 +105,49 @@ Genotype(isFound) = candidateScreen.Genotype(locS1(isFound));
 Identifier(isFound) = candidateScreen.Identifier(locS1(isFound));
 Source(isFound) = candidateScreen.Source(locS1(isFound));
 
-SKAT_Rank_Percentile = nan(numel(Genotype), 1);
+% One percentile per matched gene locus, semicolon-joined for multi-locus
+% genotypes (e.g. double mutants); loci with no SKAT match are simply
+% omitted rather than shown as "NA". "NA" is only used when no locus in
+% the genotype matches at all (e.g. N2, which has no mutant gene).
+SKAT_Rank_Percentile = strings(numel(Genotype), 1);
 for i = 1:numel(Genotype)
-    SKAT_Rank_Percentile(i) = lookupSkatPercentile(Genotype{i}, byCommon, bySetid, geneAliases);
+    pctList = lookupSkatPercentiles(Genotype{i}, byCommon, bySetid, geneAliases);
+    matchedPct = pctList(~isnan(pctList));
+    if isempty(matchedPct)
+        SKAT_Rank_Percentile(i) = "NA";
+    else
+        SKAT_Rank_Percentile(i) = strjoin(string(matchedPct), "; ");
+    end
 end
-
-% Write missing percentiles (e.g. N2, which has no mutant gene) as "NA".
-% (string(NaN) yields a <missing> string, not the text "NaN", so build
-% the string array manually rather than converting NaNs and re-matching.)
-isMissingPct = isnan(SKAT_Rank_Percentile);
-pctStr = strings(numel(SKAT_Rank_Percentile), 1);
-pctStr(~isMissingPct) = string(SKAT_Rank_Percentile(~isMissingPct));
-pctStr(isMissingPct) = "NA";
-SKAT_Rank_Percentile = pctStr;
 
 supp_table_Fig3 = table(strain_names_fig3, Genotype, Identifier, Source, mean_pre, mean_post, SKAT_Rank_Percentile, ...
     'VariableNames', {'Strain_Name', 'Genotype', 'Identifier', 'Source', ...
     'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction', 'SKAT_Rank_Percentile'});
 writetable(supp_table_Fig3, 'Fig3_mutants_quiescence_data.csv');
+
+%% === Unique gene count in the Fig3 CSV ===
+% Canonicalize each strain's SKAT-matched gene(s) to a SetID and count
+% distinct genes, so different alleles of the same gene (e.g. AR10/AR11/
+% AR4, all cysl-1) collapse to one entry. N2 and any unmatched strain
+% contribute no gene. A multi-locus genotype (e.g. VC2725) can contribute
+% more than one gene.
+allCanonicalGenes = strings(0,1);
+strainOfGene = strings(0,1);
+for i = 1:numel(Genotype)
+    ids = resolveGeneID(Genotype{i}, commonToSetid, setidToSetid, geneAliases);
+    allCanonicalGenes = [allCanonicalGenes; ids]; %#ok<AGROW>
+    strainOfGene = [strainOfGene; repmat(string(strain_names_fig3{i}), numel(ids), 1)]; %#ok<AGROW>
+end
+[uniqueGenes, ~, geneGroupIdx] = unique(allCanonicalGenes);
+fprintf('Fig3 CSV: %d strains represent %d unique gene(s)\n', numel(Genotype), numel(uniqueGenes));
+
+fprintf('Genes represented by multiple strains:\n');
+for k = 1:numel(uniqueGenes)
+    strainsForGene = strainOfGene(geneGroupIdx == k);
+    if numel(strainsForGene) > 1
+        fprintf('  %-12s : %s\n', uniqueGenes(k), strjoin(strainsForGene, ', '));
+    end
+end
 
 %% Reconstruct N2 UV wormotels from ORIGINAL unfiltered table
 dates = unique(resultsTable.Date);
@@ -953,6 +987,56 @@ function pct = lookupSkatPercentile(genotypeStr, byCommon, bySetid, aliasMap)
         pct = NaN;
     else
         pct = min(pcts);
+    end
+end
+
+function ids = resolveGeneID(genotypeStr, commonToSetid, setidToSetid, aliasMap)
+%RESOLVEGENEID Canonicalize each gene parsed from a Genotype string to its
+%SKAT SetID (a gene can appear in the tsv under Common_name or SetID), so
+%different strains/alleles of the same gene collapse to one ID. Returns a
+%string array (possibly >1 entry for multi-locus genotypes; empty if no
+%gene in the string has a SKAT match).
+    genes = extractGenesFromGenotype(genotypeStr);
+    ids = strings(0,1);
+    for i = 1:numel(genes)
+        candidates = {genes{i}};
+        if isKey(aliasMap, genes{i})
+            candidates{end+1} = aliasMap(genes{i}); %#ok<AGROW>
+        end
+        for c = 1:numel(candidates)
+            g = candidates{c};
+            if isKey(commonToSetid, g)
+                ids(end+1,1) = string(commonToSetid(g)); %#ok<AGROW>
+                break;
+            elseif isKey(setidToSetid, g)
+                ids(end+1,1) = string(setidToSetid(g)); %#ok<AGROW>
+                break;
+            end
+        end
+    end
+end
+
+function pctList = lookupSkatPercentiles(genotypeStr, byCommon, bySetid, aliasMap)
+%LOOKUPSKATPERCENTILES Like lookupSkatPercentile, but returns one
+%percentile per locus in genotype order (NaN for a locus with no SKAT
+%match) instead of collapsing multi-gene genotypes to the minimum.
+    genes = extractGenesFromGenotype(genotypeStr);
+    pctList = nan(1, numel(genes));
+    for i = 1:numel(genes)
+        candidates = {genes{i}};
+        if isKey(aliasMap, genes{i})
+            candidates{end+1} = aliasMap(genes{i}); %#ok<AGROW>
+        end
+        for c = 1:numel(candidates)
+            g = candidates{c};
+            if isKey(byCommon, g)
+                pctList(i) = byCommon(g);
+                break;
+            elseif isKey(bySetid, g)
+                pctList(i) = bySetid(g);
+                break;
+            end
+        end
     end
 end
 
