@@ -217,7 +217,7 @@ exportgraphics(gca, "Fig3A.svg");
 %% Test of variance and mean
 
 % test of variance
-disp('test of variance for N2 and MMP')
+disp('test of variance for N2 and Mutants')
 var_test_data_postUV = [mean_post; n2_mean_post_by_wormotel];
 groups_data_postUV = [ones(size(mean_post)); 2 * ones(size(n2_mean_post_by_wormotel))];
 vartestn(var_test_data_postUV, groups_data_postUV, 'TestType', 'BrownForsythe');
@@ -227,7 +227,7 @@ groups_data_preUV = [ones(size(mean_pre)); 2 * ones(size(n2_mean_pre_by_wormotel
 vartestn(var_test_data_preUV, groups_data_preUV, 'TestType', 'BrownForsythe');
 
 % test of mean
-disp('test of mean for N2 and MMP')
+disp('test of mean for N2 and Mutants')
 p = ranksum(mean_post, n2_mean_post_by_wormotel, 'tail', 'right')
 p = ranksum(mean_pre, n2_mean_pre_by_wormotel, 'tail', 'right')
 
