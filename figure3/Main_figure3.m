@@ -22,45 +22,7 @@ clear; clc; close all;
 
 load('data_strain_summary.mat');
 
-%% Filtered table only for strain-level histogram
-% Convert to string first (safe for manipulation)
-strainInfo.StrainName = string(strainInfo.StrainName);
-
-% Add " UV" to each strain
-strainInfo.StrainName = strainInfo.StrainName + " UV";
-
-% Remove any accidental spaces
-strainInfo.StrainName = strtrim(strainInfo.StrainName);
-
-% Convert to categorical
-strainInfo.StrainName = categorical(strainInfo.StrainName);
-
-
-strainInfo.Genotype = categorical(cellstr(strainInfo.Genotype));
-resultsTable2 = resultsTable(ismember(resultsTable.Strain, strainInfo.StrainName), :);
-
-%% Mean per strain (for histogram)
-[G, groupNames] = findgroups(resultsTable2.Strain);
-mean_pre  = splitapply(@mean, resultsTable2.Qf_pre, G);
-mean_post = splitapply(@mean, resultsTable2.Qf_post, G);
-
-%% === Supplemental table : per-strain pre/post-UV quiescence underlying Fig3A ===
-strain_names_fig3 = erase(cellstr(groupNames), ' UV');
-
-% Genotype/Identifier/Source looked up from a local copy of Table_S1's
-% candidate_screen tab (candidate_screen_strain_info.csv), so this script
-% does not depend on a file outside the repo.
-candidateScreen = readtable('candidate_screen_strain_info.csv');
-
-[isFound, locS1] = ismember(lower(strain_names_fig3), lower(candidateScreen.StrainName));
-Genotype = repmat({''}, numel(strain_names_fig3), 1);
-Identifier = repmat({''}, numel(strain_names_fig3), 1);
-Source = repmat({''}, numel(strain_names_fig3), 1);
-Genotype(isFound) = candidateScreen.Genotype(locS1(isFound));
-Identifier(isFound) = candidateScreen.Identifier(locS1(isFound));
-Source(isFound) = candidateScreen.Source(locS1(isFound));
-
-%% === SKAT percentile rank for each strain's gene ===
+%% === SKAT percentile lookup maps ===
 % SKAT_filtered_Na5.tsv is the SKAT gene-level association table (see
 % ../SKAT/README.md), filtered to N.Marker.Test >= 5, ranked and
 % converted to a percentile. Lives alongside this script.
@@ -83,6 +45,56 @@ end
 geneAliases = containers.Map( ...
     {'F32E10.7', 'crmb-1'}, ...
     {'cla-1', 'T21D12.11'});
+
+%% Filtered table only for strain-level histogram
+% Convert to string first (safe for manipulation)
+strainInfo.StrainName = string(strainInfo.StrainName);
+
+% Add " UV" to each strain
+strainInfo.StrainName = strainInfo.StrainName + " UV";
+
+% Remove any accidental spaces
+strainInfo.StrainName = strtrim(strainInfo.StrainName);
+
+% Convert to categorical
+strainInfo.StrainName = categorical(strainInfo.StrainName);
+
+
+strainInfo.Genotype = categorical(cellstr(strainInfo.Genotype));
+
+% Drop strains not from the SKAT priority list, except N2 (always kept as
+% the control). This removes them from the histogram, the
+% variance/rank-sum tests below, and the CSV in one place.
+hasSkatMatch = false(height(strainInfo), 1);
+for i = 1:height(strainInfo)
+    pct = lookupSkatPercentile(char(string(strainInfo.Genotype(i))), byCommon, bySetid, geneAliases);
+    hasSkatMatch(i) = ~isnan(pct);
+end
+isN2Strain = strainInfo.StrainName == "N2 UV";
+strainInfo = strainInfo(hasSkatMatch | isN2Strain, :);
+
+resultsTable2 = resultsTable(ismember(resultsTable.Strain, strainInfo.StrainName), :);
+
+%% Mean per strain (for histogram)
+[G, groupNames] = findgroups(resultsTable2.Strain);
+mean_pre  = splitapply(@mean, resultsTable2.Qf_pre, G);
+mean_post = splitapply(@mean, resultsTable2.Qf_post, G);
+
+%% === Supplemental table : per-strain pre/post-UV quiescence underlying Fig3A ===
+strain_names_fig3 = erase(cellstr(groupNames), ' UV');
+
+% Genotype/Identifier/Source looked up from a local copy of Table_S1's
+% candidate_screen tab (candidate_screen_strain_info.csv), so this script
+% does not depend on a file outside the repo.
+candidateScreen = readtable('candidate_screen_strain_info.csv');
+
+[isFound, locS1] = ismember(lower(strain_names_fig3), lower(candidateScreen.StrainName));
+Genotype = repmat({''}, numel(strain_names_fig3), 1);
+Identifier = repmat({''}, numel(strain_names_fig3), 1);
+Source = repmat({''}, numel(strain_names_fig3), 1);
+Genotype(isFound) = candidateScreen.Genotype(locS1(isFound));
+Identifier(isFound) = candidateScreen.Identifier(locS1(isFound));
+Source(isFound) = candidateScreen.Source(locS1(isFound));
 
 SKAT_Rank_Percentile = nan(numel(Genotype), 1);
 for i = 1:numel(Genotype)

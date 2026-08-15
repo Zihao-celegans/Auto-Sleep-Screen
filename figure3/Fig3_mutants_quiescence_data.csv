@@ -6,8 +6,6 @@ AR4,cysl-1(mr19) X.,https://wormbase.org/species/c_elegans/strain/WBStrain000002
 CB1126,che-6(e1126) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00004250#03--10,Caenorhabditis Genetics Center,0.147041502291112,0.685833333333333,1.49
 CB6614,egl-8(e2917) V. Outcrossed x3,https://wormbase.org/species/c_elegans/strain/WBStrain00004701#03--10,Caenorhabditis Genetics Center,0.118974469435879,0.798017939814815,0.45
 CF367,mig-14(mu71) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00004822#03--10,Caenorhabditis Genetics Center,0.169426779720897,0.578530092592592,0.23
-CFY13,C27D6.11(syb11016) II.,Fang-Yen Lab Strain Collection: CFY13,Fang-Yen Lab,0.042994966442953,0.574045138888889,NaN
-CHS1198,srv-1(yum2185) srv-2(yum2186) srv-3(yum2187) srv-4(yum2188) srv-17(yum2189) srv-19(yum2190) srv-21(yum2191) srv-22(yum2192) srv-34(yum2193) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00062447#03--10,Caenorhabditis Genetics Center,0.0304054054054054,0.593287037037037,NaN
 CZ26389,esyt-2(ju1408) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00049860#03--10,Caenorhabditis Genetics Center,0.087248322147651,0.620920138888889,12.37
 DA467,eat-6(ad467) V.,https://wormbase.org/species/c_elegans/strain/WBStrain00005464#03--10,Caenorhabditis Genetics Center,0.180766456773168,0.585565476190476,1.73
 DA601,eat-6(ad601) V.,https://wormbase.org/species/c_elegans/strain/WBStrain00005489#03--10,Caenorhabditis Genetics Center,0.149888143176734,0.701388888888889,1.73
@@ -16,11 +14,9 @@ DA997,eat-6(ad997) V.,https://wormbase.org/species/c_elegans/strain/WBStrain0000
 ET137,C30G12.1(ok910) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00007242#03--10,Caenorhabditis Genetics Center,0,0.567512077294686,12.88
 EU1135,tba-1(or346) I.,https://wormbase.org/species/c_elegans/strain/WBStrain00007346#03--10,Caenorhabditis Genetics Center,0.0574324324324324,0.538690476190476,2.7
 EU640,cul-2(or209) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00007297#03--10,Caenorhabditis Genetics Center,0.100225225225225,0.62787037037037,0.36
-FX1053,ins-11(tm1053) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00007572#03--10,Caenorhabditis Genetics Center,0.109619686800895,0.599722222222222,NaN
 FX627,lgc-11(tm627) X.,https://wormbase.org/species/c_elegans/strain/WBStrain00007565#03--10,Caenorhabditis Genetics Center,0.0603603603603604,0.624398148148148,2.04
 HY601,mat-3(or344) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00008573#03--10,Caenorhabditis Genetics Center,0.0328185328185328,0.603422619047619,0.68
 IG544,nipi-3(fr4) X.,https://wormbase.org/species/c_elegans/strain/WBStrain00021982#03--10,Caenorhabditis Genetics Center,0.133271202236719,0.657112068965517,0.8
-IK581,ins-1(nj32) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00022000#03--10,Caenorhabditis Genetics Center,0.0780964002440512,0.55077861952862,NaN
 IK777,egl-8(nj77) V. Outcrossed x5,https://wormbase.org/species/c_elegans/strain/WBStrain00022014#03--10,Caenorhabditis Genetics Center,0.0750908410033762,0.778965053763441,0.45
 JT47,egl-8(sa47) V.,https://wormbase.org/species/c_elegans/strain/WBStrain00022776#03--10,Caenorhabditis Genetics Center,0.0728403710352333,0.889750957854406,0.45
 KG1278,unc-73(ce362) I.,https://wormbase.org/species/c_elegans/strain/WBStrain00023486#03--10,Caenorhabditis Genetics Center,0.201342281879195,0.659053497942387,7.5
@@ -58,7 +54,6 @@ RB2533,F49B2.3(ok3512) I.,https://wormbase.org/species/c_elegans/strain/WBStrain
 RB2535,K10H10.2(ok3516) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00033210#03--10,Caenorhabditis Genetics Center,0.12751677852349,0.558055555555556,1.68
 RB2561,F42H10.7(ok3569) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00033236#03--10,Caenorhabditis Genetics Center,0.224242424242424,0.753842592592593,15.29
 RB2572,Y38F1A.6(ok3580) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00033247#03--10,Caenorhabditis Genetics Center,0.0771920387305003,0.582532051282051,1.17
-RB2591,C27D6.11(ok3612) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00033266#03--10,Caenorhabditis Genetics Center,0.0879594439343682,0.404054659498208,NaN
 RB684,tank-1(ok446) V.,https://wormbase.org/species/c_elegans/strain/WBStrain00031422#03--10,Caenorhabditis Genetics Center,0.299227799227799,0.647172619047619,8.7
 RB709,snf-7(ok482) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00031444#03--10,Caenorhabditis Genetics Center,0.0511744966442953,0.555338541666667,3.02
 RB778,F32E10.7(ok560) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00031491#03--10,Caenorhabditis Genetics Center,0.073620664345579,0.692236733001658,49.51
@@ -69,7 +64,6 @@ RM2221,egl-8(md1971) V. Outcrossed x2,https://wormbase.org/species/c_elegans/str
 SV1005,bmk-1(ok391) V.,https://wormbase.org/species/c_elegans/strain/WBStrain00034607#03--10,Caenorhabditis Genetics Center,0.026006711409396,0.556987847222222,2.33
 UV21,him-19(jf6) I.,https://wormbase.org/species/c_elegans/strain/WBStrain00035461#03--10,Caenorhabditis Genetics Center,0.0556569343065693,0.613888888888889,0.47
 UV26,him-19(tm3538) I.,https://wormbase.org/species/c_elegans/strain/WBStrain00035462#03--10,Caenorhabditis Genetics Center,0.0321381600578681,0.612962962962963,0.47
-VC1099,hsp-4(gk514) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00036323#03--10,Caenorhabditis Genetics Center,0.159043659043659,0.64059829059829,NaN
 VC1293,F45C12.3(gk583) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00036486#03--10,Caenorhabditis Genetics Center,0.0452290633206887,0.568900966183575,11.33
 VC16,haf-2(gk13) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00035486#03--10,Caenorhabditis Genetics Center,0.0656459731543624,0.640559895833333,1.79
 VC1715,crn-3(ok2269) II.,https://wormbase.org/species/c_elegans/strain/WBStrain00036816#03--10,Caenorhabditis Genetics Center,0.122302293948888,0.633760683760684,1.28
@@ -85,9 +79,7 @@ VC2725,gei-1(gk3062) III; C25A8.5(gk1224) IV.,https://wormbase.org/species/c_ele
 VC3112,C41A3.1(ok3769) X.,https://wormbase.org/species/c_elegans/strain/WBStrain00037677#03--10,Caenorhabditis Genetics Center,0.00713087248322148,0.600260416666667,16.91
 VC320,nrfl-1(ok297) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00035676#03--10,Caenorhabditis Genetics Center,0.348799296785874,0.631185699588477,18.39
 VC356,tag-77(gk206) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00035705#03--10,Caenorhabditis Genetics Center,0.0587318087318087,0.560897435897436,0.08
-VC364,tbb-1(gk207) III.,https://wormbase.org/species/c_elegans/strain/WBStrain00035711#03--10,Caenorhabditis Genetics Center,0.12572706935123,0.561574074074074,NaN
 VC387,cla-1(ok618) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00035728#03--10,Caenorhabditis Genetics Center,0.117559292932427,0.739761396011396,49.51
-VC475,hsp-16.2(gk249) V.,https://wormbase.org/species/c_elegans/strain/WBStrain00035801#03--10,Caenorhabditis Genetics Center,0.0465604026845638,0.619270833333333,NaN
 VC596,cla-1(gk352) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00035905#03--10,Caenorhabditis Genetics Center,0.136247657053026,0.695648148148148,49.51
 VC621,lrp-2(gk292) I.,https://wormbase.org/species/c_elegans/strain/WBStrain00035926#03--10,Caenorhabditis Genetics Center,0.11025886864813,0.598462301587302,58.04
 VC631,cla-1(ok937) IV.,https://wormbase.org/species/c_elegans/strain/WBStrain00035934#03--10,Caenorhabditis Genetics Center,0.116961083187539,0.672267025089606,49.51
@@ -103,5 +95,4 @@ tm12674,crmb-1(tm12674) IV.,https://shigen.nig.ac.jp/c.elegans/DetailsSearch?all
 tm2516,nhl-3(tm2516) II.,https://shigen.nig.ac.jp/c.elegans/DetailsSearch?allele=tm2516,National BioResource Project (Japan),0.450591216216216,0.867317708333333,0.95
 tm3221,F22G12.4(tm3221) I.,https://shigen.nig.ac.jp/c.elegans/DetailsSearch?allele=tm3221,National BioResource Project (Japan),0.191754554170662,0.654662698412698,0.93
 tm3373,K09A9.1/tmC24(tm3373) X.,https://shigen.nig.ac.jp/c.elegans/DetailsSearch?allele=tm3373,National BioResource Project (Japan),0.098274209012464,0.603918650793651,0.8
-tm4050,C27D6.11(tm4050) II.,https://shigen.nig.ac.jp/c.elegans/DetailsSearch?allele=tm4050,National BioResource Project (Japan),0.121700223713647,0.639537037037037,NaN
 tm5036,che-6(tm5036) IV.,https://shigen.nig.ac.jp/c.elegans/DetailsSearch?allele=tm5036,National BioResource Project (Japan),0.105855855855856,0.601388888888889,1.49
