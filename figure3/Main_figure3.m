@@ -60,9 +60,38 @@ Genotype(isFound) = candidateScreen.Genotype(locS1(isFound));
 Identifier(isFound) = candidateScreen.Identifier(locS1(isFound));
 Source(isFound) = candidateScreen.Source(locS1(isFound));
 
-supp_table_Fig3 = table(strain_names_fig3, Genotype, Identifier, Source, mean_pre, mean_post, ...
+%% === SKAT percentile rank for each strain's gene ===
+% SKAT_filtered_Na5.tsv is the SKAT gene-level association table (see
+% ../SKAT/README.md), filtered to N.Marker.Test >= 5, ranked and
+% converted to a percentile. Lives alongside this script.
+skat = readtable('SKAT_filtered_Na5.tsv', 'FileType', 'text', 'Delimiter', '\t');
+skatSetID = string(skat.SetID);
+skatCommon = string(skat.Common_name);
+
+byCommon = containers.Map('KeyType', 'char', 'ValueType', 'double');
+bySetid  = containers.Map('KeyType', 'char', 'ValueType', 'double');
+for i = 1:height(skat)
+    bySetid(char(skatSetID(i))) = skat.Percentile(i);
+    if skatCommon(i) ~= "N.A." && ~isKey(byCommon, char(skatCommon(i)))
+        byCommon(char(skatCommon(i))) = skat.Percentile(i);
+    end
+end
+
+% Genotype gene names that don't match the tsv's SetID/Common_name
+% directly (confirmed by manual lookup on WormBase), mapped to the
+% identifier actually used in the tsv.
+geneAliases = containers.Map( ...
+    {'F32E10.7', 'crmb-1'}, ...
+    {'cla-1', 'T21D12.11'});
+
+SKAT_Rank_Percentile = nan(numel(Genotype), 1);
+for i = 1:numel(Genotype)
+    SKAT_Rank_Percentile(i) = lookupSkatPercentile(Genotype{i}, byCommon, bySetid, geneAliases);
+end
+
+supp_table_Fig3 = table(strain_names_fig3, Genotype, Identifier, Source, mean_pre, mean_post, SKAT_Rank_Percentile, ...
     'VariableNames', {'Strain_Name', 'Genotype', 'Identifier', 'Source', ...
-    'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction'});
+    'PreUV_Quiescence_Fraction', 'PostUV_Quiescence_Fraction', 'SKAT_Rank_Percentile'});
 writetable(supp_table_Fig3, 'Fig3_mutants_quiescence_data.csv');
 
 %% Reconstruct N2 UV wormotels from ORIGINAL unfiltered table
@@ -873,4 +902,56 @@ for g = 1:numel(geneList)
 
     exportgraphics(gca, [genePanel{g}, '_scatterplot.svg']);
 
+end
+
+%% === Local functions (SKAT percentile lookup used in the Fig3A block) ===
+
+function pct = lookupSkatPercentile(genotypeStr, byCommon, bySetid, aliasMap)
+%LOOKUPSKATPERCENTILE Match gene name(s) parsed from a Genotype string to
+%the SKAT percentile rank, taking the lowest (most significant) value
+%across loci for multi-gene genotypes. Returns NaN if no gene matches.
+    genes = extractGenesFromGenotype(genotypeStr);
+    pcts = [];
+    for i = 1:numel(genes)
+        candidates = {genes{i}};
+        if isKey(aliasMap, genes{i})
+            candidates{end+1} = aliasMap(genes{i}); %#ok<AGROW>
+        end
+        for c = 1:numel(candidates)
+            g = candidates{c};
+            if isKey(byCommon, g)
+                pcts(end+1) = byCommon(g); %#ok<AGROW>
+                break;
+            elseif isKey(bySetid, g)
+                pcts(end+1) = bySetid(g); %#ok<AGROW>
+                break;
+            end
+        end
+    end
+    if isempty(pcts)
+        pct = NaN;
+    else
+        pct = min(pcts);
+    end
+end
+
+function genes = extractGenesFromGenotype(genotypeStr)
+%EXTRACTGENESFROMGENOTYPE Pull the gene identifier(s) preceding "(allele)"
+%for each ';'-separated locus in a genotype string, e.g.
+%"gei-1(gk3062) III; C25A8.5(gk1224) IV." -> {'gei-1','C25A8.5'}.
+    genes = {};
+    loci = strsplit(genotypeStr, ';');
+    for i = 1:numel(loci)
+        tok = regexp(strtrim(loci{i}), '^([^()]+)\(', 'tokens', 'once');
+        if isempty(tok)
+            continue;
+        end
+        parts = strsplit(strtrim(tok{1}), {'/', ','});
+        for p = 1:numel(parts)
+            g = strtrim(parts{p});
+            if ~isempty(g)
+                genes{end+1} = g; %#ok<AGROW>
+            end
+        end
+    end
 end
