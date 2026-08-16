@@ -39,6 +39,7 @@ reproduced.
 
 | File | What it does |
 |---|---|
+| `mmp_txt_to_vcf.py` | Converts the MMP tabular download into `MMP.vcf` (see "Building `MMP.vcf`"). |
 | `make_gene_variants.py` | Filters the raw MMP VCF down to [non-synonymous](https://en.wikipedia.org/wiki/Non-synonymous_substitution) variants. |
 | `run_pipeline.R` | Builds the gene-to-variant map, attaches phenotypes, and runs SKAT. |
 | `Make_SSID_file.R` | Standalone helper to build the gene-to-variant map from the command line. |
@@ -58,7 +59,7 @@ The ready-to-use inputs are bundled in `inputs/inputs.zip`, which contains `gene
 
 | File | What it is |
 |---|---|
-| `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). Source: [MMP data portal](https://genome.sfu.ca/mmp/). |
+| `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). Built from the [MMP data portal](https://genome.sfu.ca/mmp/) table via `scripts/mmp_txt_to_vcf.py` — see "Building `MMP.vcf`". |
 | `gene_variants.txt` | The filtered variant list, containing only the [non-synonymous](https://en.wikipedia.org/wiki/Non-synonymous_substitution) variants. |
 | `MMP.bed` / `.bim` / `.fam` | Strain genotypes in PLINK format and the FAM also holds the phenotype. |
 | `combined_phenotype.csv` | The sleep phenotype Z-scores for each screened MMP strain. |
@@ -121,8 +122,30 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 | File | What it is | Where it's from |
 |---|---|---|
-| `MMP.vcf` | The full MMP VCF: ~841k variants across 2,007 strains (~6.4 GB). | Thompson et al. 2013 ([PMC3787271](https://pmc.ncbi.nlm.nih.gov/articles/PMC3787271/)); download from the [MMP data portal](https://genome.sfu.ca/mmp/). **Not included here** — too large. |
+| `MMP.vcf` | The full MMP VCF: ~841k variants across 2,007 strains (~6.4 GB). | Built from the MMP variant table (see below), or the original combined-calls VCF (Thompson et al. 2013, [PMC3787271](https://pmc.ncbi.nlm.nih.gov/articles/PMC3787271/)). **Not included here** — too large. |
 | `combined_phenotype.csv` | The sleep phenotype for each of the 940 screened strains (`Strain,Phenotype`). | This study's behavioral screen. |
+
+---
+
+## Building `MMP.vcf` from the MMP download
+
+The [MMP data portal](https://genome.sfu.ca/mmp/) distributes the variant calls as a
+**tab-separated table** (one row per strain × variant), not as a VCF. Download that table
+(if it comes as `.xlsx`, export the first sheet to a `.txt`/`.tsv`), then convert it to a VCF:
+
+```bash
+python3 scripts/mmp_txt_to_vcf.py --txt mmp_mut_strains_data.txt --out MMP.vcf
+```
+
+This produces the multi-sample `MMP.vcf` used by the steps below (857,114 variants × 2,007
+strains). The INFO field is written with the `GF=`, `SN=`, `PN=`, `AAC=`, and `INDEL=` tags
+that `make_gene_variants.py` reads.
+
+> The MMP table covers SNVs and indels. It does not include the structural / copy-number
+> variant calls (a separate MMP call set), so a VCF built this way reproduces ~100% of the
+> non-synonymous coding SNVs (183,304 / 183,309) and most indels, but omits ~1,571 structural
+> variants present in the original combined-calls VCF. For an exact match to the deposited
+> inputs, use the original combined-calls `MMP.vcf`.
 
 ---
 
