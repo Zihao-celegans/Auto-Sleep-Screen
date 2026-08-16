@@ -151,7 +151,7 @@ that `make_gene_variants.py` reads.
 
 ## Building the variant list (`gene_variants.txt`)
 
-We keep a variant only if it changes a protein **and** belongs to an annotated gene:
+We keep a variant only if it is:
 
 - **SNVs** (single-nucleotide variants)
 - **Indels** (insertions/deletions)
