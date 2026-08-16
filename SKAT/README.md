@@ -14,7 +14,7 @@ A SKAT (Sequence Kernel Association Test) analysis was performed to quantify the
 ### Workflow
 
 The pipeline filters the variants down to non-synonymous variants, groups them
-by gene, matches each strain's genotype to its phenotype, and runs SKAT to compute the association with variation in SIS for every gene.
+by gene, matches each strain's genotype to its phenotype, and runs SKAT to compute the association with variation in SIS for every gene. See [Section 3](#3-running-the-pipeline) for how to run it.
 
 ### Outputs from the pipeline
 
