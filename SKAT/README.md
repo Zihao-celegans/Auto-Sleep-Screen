@@ -9,27 +9,22 @@ reproduced.
 
 ## Overview
 
-```
- MMP.vcf (6.4 GB, raw)                  combined_phenotype.csv
-        │                                        │
-        │  scripts/make_gene_variants.py         │  (per-strain SIS phenotype)
-        ▼                                        │
- gene_variants.txt ──┐                           │
-                     │  run_pipeline.R Step 1     │
-                     ▼                            │
-                 MMP.SSID (gene → variant map)    │
-                                                  │
- MMP.bed / MMP.bim / MMP.fam ─────────────────────┤  run_pipeline.R Step 2
-        (PLINK genotypes)                         ▼
-                                          MMP.fam (phenotype column updated)
-                     │                            │
-                     └──────────┬─────────────────┘
-                                ▼  run_pipeline.R Steps 3–4 (SKAT)
-                     ┌──────────┴───────────┐
-                     ▼                      ▼
-        SKAT_all-pvals.results   SKAT_filtered_Na5.results
-        SKAT_all-qvals.results   (≥5-allele subset; final results)
-```
+This pipeline takes two inputs and asks, for each gene, whether mutations in that gene are
+associated with the sleep phenotype.
+
+**Inputs**
+- The MMP variant data (`MMP.vcf`) — the mutations carried by each strain.
+- The sleep phenotype for each strain (`combined_phenotype.csv`).
+
+**What it does** — it filters the variants down to the ones that change a protein, groups them
+by gene, matches each strain's genotype to its phenotype, and runs SKAT to score every gene.
+
+**Outputs**
+- `SKAT_all-pvals.results` / `SKAT_all-qvals.results` — a p-value (and FDR q-value) for every gene.
+- `SKAT_filtered_Na5.results` — the final ranked list, limited to genes with enough alleles to
+  test reliably (≥5 tested non-synonymous alleles).
+
+The rest of this README lists each file and the exact steps.
 
 ---
 
