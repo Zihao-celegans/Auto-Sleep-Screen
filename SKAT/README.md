@@ -121,7 +121,7 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 We keep a variant only if it changes a protein **and** belongs to an annotated gene:
 
-- **SNVs** 
+- **SNVs** (spell out the full name of any abbreviaiton for the first time)
 - **Indels**
 - **Structural variants** 
 
