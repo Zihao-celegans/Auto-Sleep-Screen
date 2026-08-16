@@ -45,7 +45,7 @@ reproduced.
 | `Make_SSID_file.R` | Standalone helper to build the gene-to-variant map from the command line. |
 | `SKAT_prelim.R` | Interactive version of the SKAT run. | (move to debug folder)
 
-**Inputs**
+**Inputs** (add description of zip files)
 
 | File | What it is |
 |---|---|
