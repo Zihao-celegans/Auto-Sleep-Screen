@@ -151,7 +151,7 @@ that `make_gene_variants.py` reads.
 
 ## Building the variant list (`gene_variants.txt`)
 
-We keep a variant only if it is:
+We keep a variant only if it is non-synonymous:
 
 - **SNVs** (single-nucleotide variants)
 - **Indels** (insertions/deletions)
