@@ -1,13 +1,13 @@
 # SKAT MMP Analysis
 
-This runs a SKAT (Sequence Kernel Association Test) analysis linking gene-level variants in the
-Million Mutation Project (MMP) *C. elegans* strains to a continuous sleep phenotype. It walks
+This runs a SKAT (Sequence Kernel Association Test) analysis to quantify the association between individual genes in
+Million Mutation Project (MMP) *C. elegans* strains and a continuous stress-induced sleep (SIS) phenotype. It walks
 through every file, from the raw MMP data to the final ranked results, so the whole thing can be
 reproduced.
 
 ---
 
-## Overview
+## Overview (fixed later)
 
 ```
  MMP.vcf (6.4 GB, raw)                  combined_phenotype.csv
@@ -39,30 +39,30 @@ reproduced.
 
 | File | What it does |
 |---|---|
-| `make_gene_variants.py` | Filters the raw MMP VCF down to protein-altering variants. |
+| `make_gene_variants.py` | Filters the raw MMP VCF down to non-synonymous variants. (def of non-syn hyperlink) |
 | `run_pipeline.R` | Builds the gene-to-variant map, attaches phenotypes, and runs SKAT. |
-| `SKAT_Run1.R` | Older step-by-step version of the prep (SSID + phenotype setup). |
+| `SKAT_Run1.R` | Older step-by-step version of the prep (SSID + phenotype setup). | (move to debug folder)
 | `Make_SSID_file.R` | Standalone helper to build the gene-to-variant map from the command line. |
-| `SKAT_prelim.R` | Interactive version of the SKAT run. |
+| `SKAT_prelim.R` | Interactive version of the SKAT run. | (move to debug folder)
 
 **Inputs**
 
 | File | What it is |
 |---|---|
-| `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). |
-| `gene_variants.txt` | The filtered variant list. |
-| `MMP.bed` / `.bim` / `.fam` | Strain genotypes in PLINK format; the FAM also holds the phenotype. |
-| `combined_phenotype.csv` | The sleep phenotype for each screened strain. |
+| `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). Source: hyperlink|
+| `gene_variants.txt` | The filtered variant list, containing only the non-synonymous variants. (def of non-syn hyperlink) |
+| `MMP.bed` / `.bim` / `.fam` | Strain genotypes in PLINK format and the FAM also holds the phenotype. |
+| `combined_phenotype.csv` | The sleep phenotype Z-scores for each screened MMP strain. |
 | `MMP.SSID` | A map telling SKAT which variants belong to which gene (built during the run). |
 
 **Outputs**
 
 | File | What it is |
 |---|---|
-| `SKAT_all-pvals.results` | A P-value for every gene. |
-| `SKAT_all-qvals.results` | The same, sorted, with FDR q-values added. |
-| `SKAT_all_reduced_940.results` | Results limited to genes with enough variants — the final list. |
-| `validation_genes.tsv` | Known sleep genes and where they landed, used to check the method. |
+| `SKAT_all-pvals.results` | A p-value for every gene after B correction, lower p implies stronger association with changes in phenoytpe |
+| `SKAT_all-qvals.results` | The sorted version of SKAT_all-pvals.results with an additional column showing q-values after FDR control. |
+| `SKAT_all_reduced_940.results` | Results limited to genes with enough variants — the final list. (Replace) |
+| `validation_genes.tsv` | Known sleep genes and where they landed, used to check the method. (Replace) |
 
 **Steps (in order)**
 
@@ -102,7 +102,7 @@ Rscript scripts/run_pipeline.R
 | 1 | Build the gene-to-variant map (defines 19,749 genes) | `MMP.SSID` |
 | 2 | Match each strain's phenotype to its genotype | updated `MMP.fam` |
 | 3 | Run SKAT on every gene, then add FDR q-values and sort | `SKAT_all-pvals.results`, `SKAT_all-qvals.results` |
-| 4 | Re-run on genes with ≥4 variants | `SKAT_all_reduced_940.results` (final) |
+| 4 | Re-run on genes with ≥4 variants | `SKAT_all_reduced_940.results` (final) | (change)
 
 Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regenerated each run.
 
@@ -112,14 +112,14 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 | File | What it is | Where it's from |
 |---|---|---|
-| `MMP.vcf` | The full MMP VCF: ~841k variants across 2,007 strains (~6.4 GB). | Thompson et al. 2013 ([PMC3787271](https://pmc.ncbi.nlm.nih.gov/articles/PMC3787271/)); WormBase. **Not included here** — too large. |
-| `combined_phenotype.csv` | The sleep phenotype for each of the 939 screened strains (`Strain,Phenotype`). | This study's behavioral screen. |
+| `MMP.vcf` | The full MMP VCF: ~841k variants across 2,007 strains (~6.4 GB). | Thompson et al. 2013 ([PMC3787271](https://pmc.ncbi.nlm.nih.gov/articles/PMC3787271/)); WormBase. **Not included here** — too large. (hyperlink to the VCF file) |
+| `combined_phenotype.csv` | The sleep phenotype for each of the 940 screened strains (`Strain,Phenotype`). | This study's behavioral screen. |
 
 ---
 
 ## Building the variant list (`gene_variants.txt`)
 
-We keep a variant only if it changes a protein **and** belongs to a real gene:
+We keep a variant only if it changes a protein **and** belongs to an annotated gene:
 
 - **SNVs** 
 - **Indels**
@@ -138,7 +138,7 @@ This reproduces the deposited `gene_variants.txt` exactly.
 > intronic variants too. Use the script.
 >
 > This filter is also why some genes never appear in the results. For example, *flp-13* is
-> mutated in the MMP, but all of its variants are non-coding, so they're dropped here.
+> represented by three variants, but all are in the non-coding region, so they're dropped here.
 
 ---
 
@@ -168,20 +168,14 @@ plink --vcf MMP.vcf \
 ## Outputs
 
 See [`outputs/README.md`](outputs/README.md) for the column details.
-
-| File | Contents |
-|---|---|
-| `SKAT_all-pvals.results` | A P-value for every gene (19,749 total; 18,070 tested). |
-| `SKAT_all-qvals.results` | Same, sorted by P-value, with FDR q-values. |
-| `SKAT_all_reduced_940.results` | Genes with ≥4 variants — the final results. |
-| `validation_genes.tsv` | Known sleep genes with their ranks (used to check the method). |
+|
 
 ### What the gene counts mean
 
 | Number | Meaning |
 |---|---|
-| 19,749 | genes defined (had ≥1 protein-altering variant) |
+| 19,749 | genes defined (had ≥1 non-synonymous variant) |
 | 18,070 | tested and ranked |
 | 1,679 | had no usable marker, left unranked (P = 1) |
-| 15,786 | genes with ≥4 variants (the reduced file) |
+| 15,786 | genes with ≥4 variants (the reduced file) | (update)
 | 191,938 | variants in `gene_variants.txt` |
