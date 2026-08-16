@@ -102,7 +102,7 @@ Rscript scripts/run_pipeline.R
 | 1 | Build the gene-to-variant map (defines 19,749 genes) | `MMP.SSID` |
 | 2 | Match each strain's phenotype to its genotype | updated `MMP.fam` |
 | 3 | Run SKAT on every gene, then add FDR q-values and sort | `SKAT_all-pvals.results`, `SKAT_all-qvals.results` |
-| 4 | Re-run on genes with ≥4 variants | `SKAT_all_reduced_940.results` (final) | (change)
+| 4 | Re-run on genes with ≥4 variants | `SKAT_all_reduced_940.results` (final) | (change wording and files)
 
 Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regenerated each run.
 
