@@ -7,7 +7,7 @@ reproduced.
 
 ---
 
-## Overview (fixed later)
+## Overview
 
 ```
  MMP.vcf (6.4 GB, raw)                  combined_phenotype.csv
@@ -27,8 +27,8 @@ reproduced.
                                 ▼  run_pipeline.R Steps 3–4 (SKAT)
                      ┌──────────┴───────────┐
                      ▼                      ▼
-        SKAT_all-pvals.results   SKAT_all_reduced_940.results
-        SKAT_all-qvals.results   (≥4-variant subset; final results)
+        SKAT_all-pvals.results   SKAT_filtered_Na5.results
+        SKAT_all-qvals.results   (≥5-allele subset; final results)
 ```
 
 ---
@@ -39,18 +39,27 @@ reproduced.
 
 | File | What it does |
 |---|---|
-| `make_gene_variants.py` | Filters the raw MMP VCF down to non-synonymous variants. (def of non-syn hyperlink) |
+| `make_gene_variants.py` | Filters the raw MMP VCF down to [non-synonymous](https://en.wikipedia.org/wiki/Non-synonymous_substitution) variants. |
 | `run_pipeline.R` | Builds the gene-to-variant map, attaches phenotypes, and runs SKAT. |
-| `SKAT_Run1.R` | Older step-by-step version of the prep (SSID + phenotype setup). | (move to debug folder)
 | `Make_SSID_file.R` | Standalone helper to build the gene-to-variant map from the command line. |
-| `SKAT_prelim.R` | Interactive version of the SKAT run. | (move to debug folder)
 
-**Inputs** (add description of zip files)
+The following scripts are kept in `scripts/debug/` for reference and are not part of the main pipeline:
+
+| File | What it does |
+|---|---|
+| `SKAT_Run1.R` | Older step-by-step version of the prep (SSID + phenotype setup). |
+| `SKAT_prelim.R` | Interactive version of the SKAT run. |
+
+**Inputs**
+
+The ready-to-use inputs are bundled in `inputs/inputs.zip`, which contains `gene_variants.txt`,
+`MMP.bed`, `MMP.bim`, and `MMP.fam`. Unzip it into `inputs/` before running the pipeline
+(`combined_phenotype.csv` is already unzipped in `inputs/`).
 
 | File | What it is |
 |---|---|
-| `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). Source: hyperlink|
-| `gene_variants.txt` | The filtered variant list, containing only the non-synonymous variants. (def of non-syn hyperlink) |
+| `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). Source: [MMP data portal](https://genome.sfu.ca/mmp/). |
+| `gene_variants.txt` | The filtered variant list, containing only the [non-synonymous](https://en.wikipedia.org/wiki/Non-synonymous_substitution) variants. |
 | `MMP.bed` / `.bim` / `.fam` | Strain genotypes in PLINK format and the FAM also holds the phenotype. |
 | `combined_phenotype.csv` | The sleep phenotype Z-scores for each screened MMP strain. |
 | `MMP.SSID` | A map telling SKAT which variants belong to which gene (built during the run). |
@@ -61,8 +70,8 @@ reproduced.
 |---|---|
 | `SKAT_all-pvals.results` | A p-value for every gene after B correction, lower p implies stronger association with changes in phenoytpe |
 | `SKAT_all-qvals.results` | The sorted version of SKAT_all-pvals.results with an additional column showing q-values after FDR control. |
-| `SKAT_all_reduced_940.results` | Results limited to genes with enough variants — the final list. (Replace) |
-| `validation_genes.tsv` | Known sleep genes and where they landed, used to check the method. (Replace) |
+| `SKAT_filtered_Na5.results` | The ranked list limited to genes with at least 5 tested non-synonymous alleles (6,663 genes) — the final list used for candidate selection. |
+| `validation_genes.tsv` | The 15 known sleep genes used to validate the ranking, with their rank and percentile. |
 
 **Steps (in order)**
 
@@ -70,7 +79,7 @@ reproduced.
 2. **Map genes to variants** — `run_pipeline.R` builds `MMP.SSID`.
 3. **Attach phenotypes** — match each strain's sleep phenotype to its genotype.
 4. **Run SKAT** — test every gene, write the P-value results.
-5. **Refine** — re-run on genes with enough variants to get the final ranked list.
+5. **Refine** — re-rank the genes with ≥5 tested non-synonymous alleles to get the final ranked list.
 
 ---
 
@@ -102,7 +111,7 @@ Rscript scripts/run_pipeline.R
 | 1 | Build the gene-to-variant map (defines 19,749 genes) | `MMP.SSID` |
 | 2 | Match each strain's phenotype to its genotype | updated `MMP.fam` |
 | 3 | Run SKAT on every gene, then add FDR q-values and sort | `SKAT_all-pvals.results`, `SKAT_all-qvals.results` |
-| 4 | Re-run on genes with ≥4 variants | `SKAT_all_reduced_940.results` (final) | (change wording and files)
+| 4 | Re-rank the genes that have ≥5 tested non-synonymous alleles | `SKAT_filtered_Na5.results` (final) |
 
 Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regenerated each run.
 
@@ -112,7 +121,7 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 | File | What it is | Where it's from |
 |---|---|---|
-| `MMP.vcf` | The full MMP VCF: ~841k variants across 2,007 strains (~6.4 GB). | Thompson et al. 2013 ([PMC3787271](https://pmc.ncbi.nlm.nih.gov/articles/PMC3787271/)); WormBase. **Not included here** — too large. (hyperlink to the VCF file) |
+| `MMP.vcf` | The full MMP VCF: ~841k variants across 2,007 strains (~6.4 GB). | Thompson et al. 2013 ([PMC3787271](https://pmc.ncbi.nlm.nih.gov/articles/PMC3787271/)); download from the [MMP data portal](https://genome.sfu.ca/mmp/). **Not included here** — too large. |
 | `combined_phenotype.csv` | The sleep phenotype for each of the 940 screened strains (`Strain,Phenotype`). | This study's behavioral screen. |
 
 ---
@@ -121,9 +130,9 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 We keep a variant only if it changes a protein **and** belongs to an annotated gene:
 
-- **SNVs** (spell out the full name of any abbreviaiton for the first time)
-- **Indels**
-- **Structural variants** 
+- **SNVs** (single-nucleotide variants)
+- **Indels** (insertions/deletions)
+- **Structural variants**
 
 Everything else is dropped: synonymous, intronic, intergenic, UTR, and non-coding-RNA variants. This leaves 191,938 variants (from ~841k in the raw VCF).
 
@@ -168,7 +177,6 @@ plink --vcf MMP.vcf \
 ## Outputs
 
 See [`outputs/README.md`](outputs/README.md) for the column details.
-|
 
 ### What the gene counts mean
 
@@ -177,5 +185,5 @@ See [`outputs/README.md`](outputs/README.md) for the column details.
 | 19,749 | genes defined (had ≥1 non-synonymous variant) |
 | 18,070 | tested and ranked |
 | 1,679 | had no usable marker, left unranked (P = 1) |
-| 15,786 | genes with ≥4 variants (the reduced file) | (update)
+| 6,663 | genes with ≥5 tested non-synonymous alleles (the final filtered file) |
 | 191,938 | variants in `gene_variants.txt` |
