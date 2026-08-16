@@ -40,7 +40,7 @@ reproduced.
 | File | What it does |
 |---|---|
 | `mmp_txt_to_vcf.py` | Converts the MMP tabular download into `MMP.vcf` (see "Building `MMP.vcf`"). |
-| `make_gene_variants.py` | Filters the raw MMP VCF down to [non-synonymous](https://en.wikipedia.org/wiki/Non-synonymous_substitution) variants. |
+| `make_gene_variants.py` | Filters the raw MMP VCF down to [non-synonymous](#building-the-variant-list-gene_variantstxt) variants. |
 | `run_pipeline.R` | Builds the gene-to-variant map, attaches phenotypes, and runs SKAT. |
 | `Make_SSID_file.R` | Standalone helper to build the gene-to-variant map from the command line. |
 
@@ -60,7 +60,7 @@ The ready-to-use inputs are bundled in `inputs/inputs.zip`, which contains `gene
 | File | What it is |
 |---|---|
 | `MMP.vcf` | The raw Million Mutation Project variant data (not included, too large). Built from the [MMP data portal](https://genome.sfu.ca/mmp/) table via `scripts/mmp_txt_to_vcf.py` — see "Building `MMP.vcf`". |
-| `gene_variants.txt` | The filtered variant list, containing only the [non-synonymous](https://en.wikipedia.org/wiki/Non-synonymous_substitution) variants. |
+| `gene_variants.txt` | The filtered variant list, containing only the [non-synonymous](#building-the-variant-list-gene_variantstxt) variants. |
 | `MMP.bed` / `.bim` / `.fam` | Strain genotypes in PLINK format and the FAM also holds the phenotype. |
 | `combined_phenotype.csv` | The sleep phenotype Z-scores for each screened MMP strain. |
 | `MMP.SSID` | A map telling SKAT which variants belong to which gene (built during the run). |

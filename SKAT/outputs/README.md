@@ -42,8 +42,11 @@ All 19,749 gene sets
 Same rows, sorted by P-value, plus an FDR `Q.value` (`fdrtool`). The 1,679 untested genes (P = 1)
 sort to the bottom; the real ranking is the tested genes above them.
 
-### `SKAT_all_reduced_940.results`
-Genes with ≥4 annotated non-synonymous variants, re-run and sorted by P-value with fresh q-values. This is the filter found in original SKAT analysis. We found our own threshold by analyzing the median and mean percentile rankings.
+### `SKAT_filtered_Na5.results`
+The final list: genes with at least 5 tested non-synonymous alleles (`N.Marker.Test >= 5`),
+sorted by P-value. This is 6,663 genes and is the list used for candidate selection. We chose
+the threshold of 5 by analyzing the median (PMR) and mean percentile rankings of known sleep
+genes across allele-count cutoffs.
 
 
 
