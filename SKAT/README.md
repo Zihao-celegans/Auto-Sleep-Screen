@@ -92,8 +92,13 @@ install.packages(c("SKAT", "fdrtool", "dplyr", "plyr", "stringr"))
 
 ### 3.2 PLINK
 
-**PLINK** (only needed if rebuilding `MMP.bed` from the VCF):
-[www.cog-genomics.org/plink](https://www.cog-genomics.org/plink/)
+Only needed if rebuilding `MMP.bed` from the VCF. Install with conda:
+
+```bash
+conda install -c bioconda plink
+```
+
+Or download the binary directly from [www.cog-genomics.org/plink](https://www.cog-genomics.org/plink/).
 
 ---
 
