@@ -121,12 +121,11 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 We keep a variant only if it changes a protein **and** belongs to a real gene:
 
-- **SNVs** — kept if nonsynonymous (missense or stop); synonymous ones are dropped.
-- **Indels** — kept (small induced insertions/deletions).
-- **Structural variants** — kept if they have a coding effect.
+- **SNVs** 
+- **Indels**
+- **Structural variants** 
 
-Everything else is dropped: synonymous, intronic, intergenic, UTR, and non-coding-RNA variants,
-plus anything not assigned to a named gene. This leaves 191,938 variants (from ~841k in the raw VCF).
+Everything else is dropped: synonymous, intronic, intergenic, UTR, and non-coding-RNA variants. This leaves 191,938 variants (from ~841k in the raw VCF).
 
 ```bash
 python3 scripts/make_gene_variants.py --vcf MMP.vcf --out inputs/gene_variants.txt \
