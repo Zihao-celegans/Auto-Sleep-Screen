@@ -27,7 +27,7 @@ The rest of this README lists each file and the exact steps.
 
 ---
 
-## What each file and step does (quick reference)
+## What each file and step does
 
 **Scripts**
 
@@ -63,7 +63,7 @@ The ready-to-use inputs are bundled in `inputs/inputs.zip`, which contains `gene
 
 | File | What it is |
 |---|---|
-| `SKAT_all-pvals.results` | A p-value for every gene after B correction, lower p implies stronger association with changes in phenoytpe |
+| `SKAT_all-pvals.results` | A p-value for every gene after Bonferroni correction, a lower p implies stronger association with changes in phenoytpes |
 | `SKAT_all-qvals.results` | The sorted version of SKAT_all-pvals.results with an additional column showing q-values after FDR control. |
 | `SKAT_filtered_Na5.results` | The ranked list limited to genes with at least 5 tested non-synonymous alleles (6,663 genes) — the final list used for candidate selection. |
 | `validation_genes.tsv` | The 15 known sleep genes used to validate the ranking, with their rank and percentile. |
@@ -123,9 +123,7 @@ Temporary files (`MMP.SSID`, `MMP.SSD`, etc.) are written to `inputs/` and regen
 
 ## Building `MMP.vcf` from the MMP download
 
-The [MMP data portal](https://genome.sfu.ca/mmp/) distributes the variant calls as a
-tab-separated table (one row per strain × variant), not as a VCF. Download that table
-(if it comes as `.xlsx`, export the first sheet to a `.txt`/`.tsv`), then convert it to a VCF:
+The MMP data portal ([https://genome.sfu.ca/mmp/](https://genome.sfu.ca/mmp/)) distributes the variant calls as a tab-separated table (one row per strain × variant), not as a VCF. Download "Results from mutagenized strains" (file size: 76 MB, if it comes as `.xlsx`, export the first sheet to a `.txt`/`.tsv`), then convert it to a VCF:
 
 ```bash
 python3 scripts/mmp_txt_to_vcf.py --txt mmp_mut_strains_data.txt --out MMP.vcf
@@ -193,8 +191,8 @@ See [`outputs/README.md`](outputs/README.md) for the column details.
 
 | Number | Meaning |
 |---|---|
-| 19,749 | genes defined (had ≥1 non-synonymous variant) |
+| 19,749 | genes represented by ≥1 non-synonymous alleles in the MMP strains we screened |
 | 18,070 | tested and ranked |
-| 1,679 | had no usable marker, left unranked (P = 1) |
+| 1,679 | genes not represented by any non-synonymous alleles in the MMP strains we screened, left unranked (P = 1) |
 | 6,663 | genes with ≥5 tested non-synonymous alleles (the final filtered file) |
 | 191,938 | variants in `gene_variants.txt` |
