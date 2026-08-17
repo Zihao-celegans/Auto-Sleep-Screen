@@ -21,21 +21,28 @@ authored by Zihao (John) Li *et al.*, Fang-Yen Laboratory, Department of Biomedi
 └── README.md
 ```
 
-Each `figureN/` folder is self-contained: open MATLAB, `cd` into the folder,
-and run `Main_figureN.m`. The script will generate the figures shown in the paper.
-`Main_figure2.m` and `Main_figure3.m` additionally write out a supplemental CSV of the per-strain data.
+## Reproducing figures
+Each `figureN/` folder is self-contained. To regenerate paper figures:
 
-[tableS1/](tableS1/) combines those per-strain CSVs from `figure2/` and
-`figure3/` into Table S1 (`tableS1/Table_S1.xlsx`), with one
+1. Open MATLAB, `cd` into the corresponding `figureN/` folder.
+2. Run `Main_figureN.m`. Figures display on screen and are saved as SVG files
+into the same folder. `Main_figure2.m` and `Main_figure3.m` additionally write out
+a supplemental CSV of the per-strain data.
+
+## Reproducing Table S1
+[tableS1/](tableS1/) combines the per-strain CSVs written by `Main_figure2.m` and
+`Main_figure3.m` (see Reproducing figures above) into Table S1 (`tableS1/Table_S1.xlsx`), with one
 sheet for `MMP_screen` and another for `candidate_screen`. To regenerate it:
 
 1. Run `Main_figure2.m` and `Main_figure3.m` (see above) so their CSVs are up to date.
 2. Open MATLAB, `cd` into `tableS1/`, and run `Make_Table_S1.m`.
 3. `tableS1/Table_S1.xlsx` is written (overwriting any previous copy).
 
+## SKAT analysis
 The SKAT analysis pipeline lives in
 [SKAT/](SKAT/); see [SKAT/README.md](SKAT/README.md) for how to run it.
 
+## Helper functions
 Shared MATLAB helper functions live in [helpers/](helpers/); see
 [helpers/README.md](helpers/README.md) for a description of each one.
 
@@ -46,12 +53,6 @@ Shared MATLAB helper functions live in [helpers/](helpers/); see
 
 **R** (for the SKAT pipeline only; tested on R 4.3+)
 - See [SKAT/README.md](SKAT/README.md) for the full list and usage.
-
-## Reproducing the figures
-
-1. Open MATLAB and set the working directory to one of the `figureN/` folders.
-2. Run `Main_figureN.m`. Figures display on screen and are saved as SVG
-   files into the same folder.
 
 ## License
 
