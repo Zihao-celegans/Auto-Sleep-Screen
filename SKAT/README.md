@@ -179,14 +179,52 @@ plink --vcf MMP.vcf \
 
 ## 4. Outputs
 
-See [`outputs/README.md`](outputs/README.md) for the column details.
+### 4.1 Some important gene counts
 
-### 4.1 What the gene counts mean
-
-| Number  | Meaning                                                                                                   |
+| Counts |  Meaning                                                                                                  |
 | ------- | --------------------------------------------------------------------------------------------------------- |
-| 19,749  | genes represented by ≥1 non-synonymous alleles in the MMP strains we screened                             |
-| 18,070  | tested and ranked                                                                                         |
-| 1,679   | genes not represented by any non-synonymous alleles in the MMP strains we screened, left unranked (P = 1) |
-| 6,663   | genes with ≥5 tested non-synonymous alleles (the final filtered file)                                     |
-| 191,938 | variants in `gene_variants.txt`                                                                           |
+| 19,749  | genes represented by ≥1 non-synonymous alleles in the entire MMP set (2,007 strains)                       |
+| 18,070  | genes represented by ≥1 non-synonymous alleles in the 940 MMP strains we screened                         |
+| 1,679   | genes not represented by any non-synonymous alleles in the 940 MMP strains we screened, left unranked (P = 1) |
+| 6,663   | genes represented by ≥5 non-synonymous alleles in the 940 MMP strains we screened (the final ranked list for candidate screening)                                     |
+
+See [§3.3.2](#332-building-the-variant-list-gene_variantstxt) for the definition of non-synonymous variants.
+
+---
+
+### 4.2 File and column descriptions
+
+#### `SKAT_all-pvals.results`
+Results for all 19,749 genes
+
+| Column | Description |
+|---|---|
+| `SetID` | Gene sequence name (e.g. `ZK1067.1`) |
+| `P.value` | SKAT P-value (1 if untested) |
+| `N.Marker.All` | Variants assigned to the gene for the entire MMP set |
+| `N.Marker.Test` | Variants present in the MMP strains we screened and actually used by SKAT (0 = not present) |
+
+#### `SKAT_all-qvals.results`
+Same as `SKAT_all-pvals.results`, but sorted by P-value, plus a column of FDR `Q.value` (`fdrtool`). The 1,679 untested genes (P = 1)
+sort to the bottom.
+
+#### `SKAT_filtered_Na5.results`
+The ranked list for genes represented by at least 5 tested non-synonymous alleles (`N.Marker.Test >= 5`),
+sorted by P-value. This list contains 6,663 genes and was used for candidate screening. We chose
+the threshold of 5 by analyzing the median and mean percentile rankings of known sleep
+genes across allele-count cutoffs (see main manuscript for details).
+
+#### `validation_genes.tsv`
+The 15 known sleep genes used to validate the ranking, with their rank and percentile among the
+18,070 tested genes.
+
+| Column | Description |
+|---|---|
+| `gene` | Gene name (e.g. `aptf-1`) |
+| `SetID` | Gene sequence name (e.g. `K06A1.1`) |
+| `P.value` | SKAT P-value |
+| `N.Marker.All` | Variants assigned to the gene for the entire MMP set |
+| `N.Marker.Test` | Variants present in the MMP strains we screened and actually used by SKAT |
+| `rank_of_18070_tested` | Rank of this gene among the 18,070 tested genes (1 = strongest association) |
+| `percentile` | Percentile rank of this gene among the 18,070 tested genes |
+| `source` | TBD |
