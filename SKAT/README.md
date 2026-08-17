@@ -8,7 +8,7 @@ A SKAT (Sequence Kernel Association Test) analysis was performed to quantify the
 
 ### Inputs to the pipeline
 
-* The MMP variant data (`MMP.vcf`) — the mutations carried by each strain.
+* The MMP variant data.
 * The sleep phenotype for each strain (`combined_phenotype.csv`).
 
 ### Workflow
@@ -18,8 +18,8 @@ by gene, matches each strain's genotype to its phenotype, and runs SKAT to compu
 
 ### Outputs from the pipeline
 
-* `SKAT_all-pvals.results` / `SKAT_all-qvals.results` — a p-value and q-value for every gene.
-* `SKAT_filtered_Na5.results` — the final ranked list, limited to genes with enough alleles to test reliably (≥5 tested non-synonymous alleles).
+* `SKAT_all-pvals.results` / `SKAT_all-qvals.results` — a p-value and q-value for every gene, indicating the strength of association to the phenotype.
+* `SKAT_filtered_Na5.results` — the final ranked list used for candidate screening, limited to genes with enough alleles to test reliably (≥5 tested non-synonymous alleles).
 
 ---
 
@@ -51,7 +51,7 @@ The pre-generated input files are bundled in `inputs/inputs.zip`, which contains
 
 | File                        | What it is                                                                                                                                                                                              |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `MMP.vcf`                   | The raw Million Mutation Project variant data (not included, too large). Built from the [MMP data portal](https://genome.sfu.ca/mmp/) table via `scripts/mmp_txt_to_vcf.py` — see ["Building `MMP.vcf`"](#331-building-mmpvcf-from-the-mmp-database). |
+| `MMP.vcf`                   | The raw Million Mutation Project variant data (not included, too large). Not required to run the pipeline with the pre-generated inputs (see [§3.2](#32-commands-necessary-to-run-the-pipeline-using-pre-generated-input-files)); only needed if rebuilding inputs from scratch (see [§3.3](#33-instructions-to-generate-input-files-from-scratch)). Built from the [MMP data portal](https://genome.sfu.ca/mmp/) download, see ["Building `MMP.vcf`"](#331-building-mmpvcf-from-the-mmp-database). |
 | `gene_variants.txt`         | The filtered variant list, containing only the [non-synonymous](#332-building-the-variant-list-gene_variantstxt) variants.                                                                               |
 | `MMP.bed` / `.bim` / `.fam` | Strain genotypes in PLINK format; the FAM file also holds the phenotype.                                                                                                                                   |
 | `combined_phenotype.csv`    | The sleep phenotype Z-scores for each individually screened MMP strain.                                                                                                                                       |
@@ -91,7 +91,7 @@ Or download the binary directly from [www.cog-genomics.org/plink](https://www.co
 
 ### 3.2 Commands necessary to run the pipeline using pre-generated input files
 
-The pre-generated input files are in `inputs.zip`, so it just takes two commands to run the pipeline:
+All the input files necessary to run the pipeline have been pre-generated and compressed in `inputs.zip`, so it just takes two commands to run the pipeline:
 
 ```bash
 unzip inputs/inputs.zip -d inputs/
