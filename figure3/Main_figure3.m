@@ -339,7 +339,10 @@ geneMarkerSize = 70;
 legendEntries = [];
 legendLabels  = {};
 
-figure('Color','w'); hold on; box on;
+% Painters keeps every element (errorbars, dots) as true vector paths on
+% export; without this MATLAB can silently fall back to a rasterized
+% OpenGL snapshot for figures with many plotted objects, like this one.
+figure('Color','w','Renderer','painters'); hold on; box on;
 
 % ============================================================
 %   STRAIN ORDER: plot non-N2 first, N2 last
@@ -497,7 +500,8 @@ ax.LineWidth = 2;
 hold off;
 
 box off;
-exportgraphics(gca, "Fig3B.svg");
+% ContentType 'vector' prevents exportgraphics from rasterizing this axes.
+exportgraphics(gca, "Fig3B.svg", 'ContentType', 'vector');
 
 %% === Fig3 per-gene panels: trace heatmap + scatter ===
 % Outputs:  strd-1heat.svg, cla-1heat.svg, egl-8heat.svg
