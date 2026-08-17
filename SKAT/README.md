@@ -1,4 +1,4 @@
-# SKAT Analysis for stress-induced sleep (SIS) phenotype of MMP strains
+# SKAT analysis for stress-induced sleep (SIS) phenotype of MMP strains
 
 A SKAT (Sequence Kernel Association Test) analysis was performed to quantify the association between individual genes in Million Mutation Project (MMP) *C. elegans* strains and a continuous stress-induced sleep (SIS) phenotype.
 
@@ -227,4 +227,4 @@ The 15 known sleep genes used to validate the ranking, with their rank and perce
 | `N.Marker.Test` | Variants present in the MMP strains we screened and actually used by SKAT |
 | `rank_of_18070_tested` | Rank of this gene among the 18,070 tested genes (1 = strongest association) |
 | `percentile` | Percentile rank of this gene among the 18,070 tested genes |
-| `source` | TBD |
+| `source` | Database the gene's `SetID` (gene sequence name) is sourced from (e.g. `WormBase`) |
