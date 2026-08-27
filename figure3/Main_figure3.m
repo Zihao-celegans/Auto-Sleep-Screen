@@ -2,7 +2,8 @@
 % Panels:
 %   Fig3A : MMP-vs-N2 histogram (per-wormotel N2 reconstruction).
 %   Fig3B : Pre-UV vs post-UV mean ± SEM dot plot for follow-up alleles.
-%   Fig3C-E (per-gene) : trace heatmap + beeswarm scatter for strd-1, cla-1, egl-8.
+%   Fig3C-H (per-gene) : trace heatmap + beeswarm scatter for strd-1, cla-1, egl-8
+%                        (C/D = strd-1, E/F = cla-1, G/H = egl-8; heatmap/scatter).
 %
 % Helper functions (fracQ, beeswarm) live in ../helpers/.
 %
@@ -504,8 +505,8 @@ box off;
 exportgraphics(gca, "Fig3B.svg", 'ContentType', 'vector');
 
 %% === Fig3 per-gene panels: trace heatmap + scatter ===
-% Outputs:  strd-1heat.svg, cla-1heat.svg, egl-8heat.svg
-%           strd-1_scatter.svg, cla-1_scatter.svg, egl-8_scatter.svg
+% Outputs:  Fig3C.svg, Fig3E.svg, Fig3G.svg (heatmaps)
+%           Fig3D.svg, Fig3F.svg, Fig3H.svg (scatterplots)
 clear; clc; close all;
 
 addpath(fullfile('..', 'helpers'));
@@ -526,7 +527,8 @@ strainToGene = containers.Map( ...
      );
 
 geneList = {'strd-1', 'cla-1', 'egl-8'};
-genePanel = {'Fig3C',  'Fig3D', 'Fig3E'};   % panel letter for each gene
+genePanelHeatmap = {'Fig3C', 'Fig3E', 'Fig3G'};   % heatmap panel letter for each gene
+genePanelScatter = {'Fig3D', 'Fig3F', 'Fig3H'};   % scatterplot panel letter for each gene
 
 alpha_pre  = 0.05; %#ok<NASGU>
 alpha_post = 0.05; %#ok<NASGU>
@@ -736,7 +738,7 @@ for g = 1:numel(geneList)
     ax.FontSize = 29;
     pbaspect([1 ratio 1]);
 
-    exportgraphics(gca, [genePanel{g}, '_heatmap.svg']);
+    exportgraphics(gca, [genePanelHeatmap{g}, '.svg']);
 
     %% =========================================================
     %   Per-strain stats for scatter plot
@@ -967,7 +969,7 @@ for g = 1:numel(geneList)
     ax.LineWidth = 2;
     pbaspect([1 ratio 1]);
 
-    exportgraphics(gca, [genePanel{g}, '_scatterplot.svg']);
+    exportgraphics(gca, [genePanelScatter{g}, '.svg']);
 
 end
 
