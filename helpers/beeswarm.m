@@ -40,6 +40,9 @@ addOptional(p,'colormap','lines')
 addOptional(p,'MarkerFaceColor','')
 addOptional(p,'MarkerFaceAlpha',.5)
 addOptional(p,'MarkerEdgeColor','none')
+addOptional(p,'Marker','o') % single marker, or cell array (one per category)
+addOptional(p,'MarkerFill',true) % single logical, or cell array (one per category)
+addOptional(p,'MarkerLineWidth',0.5) % outline thickness for hollow markers; single value, or cell array (one per category)
 parse(p,x,y,varargin{:});
 
 % extra parameters
@@ -197,12 +200,32 @@ if isfinite(p.Results.dot_size)
         cmap = feval(p.Results.colormap,length(ux));
     end
     for i=1:length(ux)
-        if isempty(p.Results.MarkerFaceColor')
-            scatter(x(ic==i),y(ic==i),p.Results.dot_size*36,'filled','MarkerFaceAlpha', ...
-                p.Results.MarkerFaceAlpha,'MarkerEdgeColor',p.Results.MarkerEdgeColor,'MarkerFaceColor',cmap(i,:))
+        if iscell(p.Results.Marker)
+            mkr = p.Results.Marker{i};
         else
-            scatter(x(ic==i),y(ic==i),p.Results.dot_size*36,'filled','MarkerFaceAlpha', ...
-                p.Results.MarkerFaceAlpha,'MarkerEdgeColor',p.Results.MarkerEdgeColor,'MarkerFaceColor',p.Results.MarkerFaceColor)
+            mkr = p.Results.Marker;
+        end
+        if iscell(p.Results.MarkerFill)
+            doFill = p.Results.MarkerFill{i};
+        else
+            doFill = p.Results.MarkerFill;
+        end
+        if isempty(p.Results.MarkerFaceColor')
+            faceColor = cmap(i,:);
+        else
+            faceColor = p.Results.MarkerFaceColor;
+        end
+        if iscell(p.Results.MarkerLineWidth)
+            lw = p.Results.MarkerLineWidth{i};
+        else
+            lw = p.Results.MarkerLineWidth;
+        end
+        if doFill
+            scatter(x(ic==i),y(ic==i),p.Results.dot_size*36,'filled','Marker',mkr,'MarkerFaceAlpha', ...
+                p.Results.MarkerFaceAlpha,'MarkerEdgeColor',p.Results.MarkerEdgeColor,'MarkerFaceColor',faceColor)
+        else
+            % hollow marker: color the outline instead of the (nonexistent) fill
+            scatter(x(ic==i),y(ic==i),p.Results.dot_size*36,'Marker',mkr,'MarkerEdgeColor',faceColor,'LineWidth',lw)
         end
         hold on
         iqr = prctile(yorig(ic==i),[25 75]);
