@@ -43,6 +43,7 @@ addOptional(p,'MarkerEdgeColor','none')
 addOptional(p,'Marker','o') % single marker, or cell array (one per category)
 addOptional(p,'MarkerFill',true) % single logical, or cell array (one per category)
 addOptional(p,'MarkerLineWidth',0.5) % outline thickness for hollow markers; single value, or cell array (one per category)
+addOptional(p,'ChannelWidth',.9,validScalarPosNum) % fraction of the unit gap between categories that the swarm may use; lower it to leave more empty space between adjacent groups
 parse(p,x,y,varargin{:});
 
 % extra parameters
@@ -50,7 +51,7 @@ rwid = .05; % width of overlay box/dash
 
 dcut=8; % spacing factor
 nxloc=512; % resolution for optimization
-chanwid = .9; % percent width of channel to use
+chanwid = p.Results.ChannelWidth; % percent width of channel to use
 yl = [min(y) max(y)]; % default y-limits
 asp_rat = 1;
 keep_hold = false;
