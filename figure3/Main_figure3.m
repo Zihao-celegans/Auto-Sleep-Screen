@@ -21,7 +21,9 @@ addpath(fullfile('..', 'helpers'));
 %% === Fig3A : MMP-vs-N2 histogram ===
 clear; clc; close all;
 
-load('data_strain_summary.mat');
+% Only resultsTable/strainInfo are used below; data_strain_summary.mat is
+% trimmed to just these two variables to keep the file small.
+load('data_strain_summary.mat', 'resultsTable', 'strainInfo');
 
 %% === SKAT percentile lookup maps ===
 % SKAT_filtered_Na5.tsv is the SKAT gene-level association table (see
